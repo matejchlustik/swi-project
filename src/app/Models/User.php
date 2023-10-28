@@ -47,6 +47,6 @@ class User extends Authenticatable
 
     public function role() :BelongsTo
     {
-        return $this->belongsTo('App\Role');
+        return $this->belongsTo(Role::class);
     }
 }
