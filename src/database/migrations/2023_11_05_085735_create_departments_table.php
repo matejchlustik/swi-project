@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('short');
-            $table->integer('faculties_id');
+            $table->foreignId('faculty_id')->constrained();
         });
     }
 
