@@ -14,11 +14,13 @@ class UserController extends Controller
         $fields = $request->validate([
             'email' => 'required|string|unique:users,email',
             'password' => 'required|string|confirmed',
-            'name' => 'required|string'
+            'first_name' => 'required|string',
+            'last_name' => 'required|string'
         ]);
 
         $user = User::create([
-            'name' => $fields['name'],
+            'last_name' => $fields['last_name'],
+            'first_name' => $fields['first_name'],
             'email' => $fields['email'],
             'password' => Hash::make($fields['password']),
             'role_id' => Role::firstWhere("role", "Študent")->id
