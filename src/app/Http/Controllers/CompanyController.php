@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use Illuminate\Http\Request;
 
-class CompanieController extends Controller
+class CompanyController extends Controller
 {
     public function index()
     {
@@ -32,7 +32,7 @@ class CompanieController extends Controller
             'message' => 'Company updated successfully.',
         ]);
     }
-    public function find(int $id)
+    public function show(int $id)
     {
         $company = Company::findOrFail($id);
 
