@@ -19,7 +19,7 @@ class CompanyController extends Controller
             'prev_page' =>$companies['prev_page_url'],
             'last_page' =>$companies['last_page_url'],
             'next_url' => $companies['next_page_url']
-        ]);
+        ],200);
     }
     public function update(int $id, Request $request)
     {
@@ -29,8 +29,8 @@ class CompanyController extends Controller
         $company->save();
 
         return response()->json([
-            'message' => 'Company updated successfully.',
-        ]);
+            'company' => $company,
+        ],200);
     }
     public function show(int $id)
     {
@@ -45,10 +45,10 @@ class CompanyController extends Controller
         $company->save();
 
         return response()->json([
-            'message' => 'Company created successfully.',
-        ]);
+            'company' => $company,
+        ],201);
     }
-    public function delete(int $id)
+    public function destroy(int $id)
     {
         $company = Company::findOrFail($id);
         $company->delete();

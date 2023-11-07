@@ -17,7 +17,7 @@ use App\Http\Controllers\CompanyController;
 */
 Route::post("/register", [UserController::class, "register"]);
 Route::put("/companies/{company}", [CompanyController::class, "update"]);
-Route::delete("/companies/{company}", [CompanyController::class, "delete"]);
+Route::delete("/companies/{company}", [CompanyController::class, "destroy"]);
 Route::get("/companies", [CompanyController::class, "index"]);
 Route::get("/companies/{company}", [CompanyController::class, "show"]);
 Route::post("/companies", [CompanyController::class, "store"]);
