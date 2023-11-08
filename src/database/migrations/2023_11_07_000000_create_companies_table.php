@@ -14,12 +14,14 @@ class CreateCompaniesTable extends Migration
     {
         Schema::create('companies', function (Blueprint $table) {
             $table->id();
-            $table->string('name', 255);
-            $table->string('short', 15);
-            $table->string('city', 45);
-            $table->string('zip_code', 6);
-            $table->string('phone', 15);
-            $table->string('email', 45);
+            $table->integer('ICO');//->unique();
+            $table->string('name' );
+            $table->string('city' );
+            $table->string('zip_code' );
+            $table->string('phone' );
+            $table->string('email');
+            $table->string('street');
+            $table->string('house_number');
             $table->timestamps();
         });
     }

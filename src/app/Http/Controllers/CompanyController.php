@@ -21,36 +21,31 @@ class CompanyController extends Controller
             'next_url' => $companies['next_page_url']
         ],200);
     }
-    public function update(int $id, Request $request)
+    public function update(Company $company, Request $request)
     {
-        $company = Company::findOrFail($id);
-
         $company->fill($request->all());
         $company->save();
 
         return response()->json([
-            'company' => $company,
-        ],200);
+            'message' => 'Company updated successfully.',
+        ]);
     }
-    public function show(int $id)
+    public function show(Company $company)
     {
-        $company = Company::findOrFail($id);
+        $company = Company::findOrFail($company);
 
         return response()->json($company);
     }
-    public function store(Request $request)
+    public function store(Company $company)
     {
-        $company = new Company();
-        $company->fill($request->all());
         $company->save();
 
         return response()->json([
             'company' => $company,
         ],201);
     }
-    public function destroy(int $id)
+    public function destroy(Company $company)
     {
-        $company = Company::findOrFail($id);
         $company->delete();
 
         return response()->json([
