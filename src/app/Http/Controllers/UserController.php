@@ -56,17 +56,22 @@ class UserController extends Controller {
             return response('can\'t send company_id and department_id together', 400);
         }
 
+        function createUser($fields) {
+            return User::create([
+                'last_name' => $fields['last_name'],
+                'first_name' => $fields['first_name'],
+                'email' => $fields['email'],
+                'password' => Hash::make('123'),
+                'role_id' => $fields['role_id'],
+            ]);
+        }
+
         switch ($fields['role_id']) {
             case 2:
                 if($fields['department_id']) {
                     if (auth()->user()->tokenCan('create-department-head')) {
-                        $newUser = User::create([
-                            'last_name' => $fields['last_name'],
-                            'first_name' => $fields['first_name'],
-                            'email' => $fields['email'],
-                            'password' => Hash::make('123'),
-                            'role_id' => $fields['role_id'],
-                        ]);
+                        
+                        $newUser = createUser($fields);
 
                         DepartmentEmployee::create([
                             'user_id' => $newUser->id,
@@ -81,13 +86,8 @@ class UserController extends Controller {
             case 3:
                 if($fields['department_id'] !== null) {
                     if (auth()->user()->tokenCan('create-department-head')) {
-                        $newUser = User::create([
-                            'last_name' => $fields['last_name'],
-                            'first_name' => $fields['first_name'],
-                            'email' => $fields['email'],
-                            'password' => Hash::make('123'),
-                            'role_id' => $fields['role_id'],
-                        ]);
+                        
+                        $newUser = createUser($fields);
 
                         DepartmentEmployee::create([
                             'user_id' => $newUser->id,
@@ -102,13 +102,8 @@ class UserController extends Controller {
             case 4:
                 if($fields['company_id'] !== null && $fields['phone'] !== null) {
                     if (auth()->user()->tokenCan('create-company-representative')) {
-                        $newUser = User::create([
-                            'last_name' => $fields['last_name'],
-                            'first_name' => $fields['first_name'],
-                            'email' => $fields['email'],
-                            'password' => Hash::make('123'),
-                            'role_id' => $fields['role_id'],
-                        ]);
+                        
+                        $newUser = createUser($fields);
 
                         CompanyEmployee::create([
                             'user_id' => $newUser->id,
@@ -123,13 +118,8 @@ class UserController extends Controller {
 
             case 5:
                 if (auth()->user()->tokenCan('create-student')) {
-                    $newUser = User::create([
-                        'last_name' => $fields['last_name'],
-                        'first_name' => $fields['first_name'],
-                        'email' => $fields['email'],
-                        'password' => Hash::make('123'),
-                        'role_id' => $fields['role_id'],
-                    ]);
+                    
+                    $newUser = createUser($fields);
 
                     return response('User created', 201);
                 } else return response('Unauthorized', 401);
@@ -138,5 +128,7 @@ class UserController extends Controller {
             default:
                 return response('Wrong role_id', 401);
         }
+
+        
     }
 }
