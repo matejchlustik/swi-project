@@ -18,6 +18,8 @@ use App\Http\Controllers\CompanyController;
 
 Route::post("/register", [UserController::class, "register"]);
 
+Route::post("/login", [UserController::class, "login"]);
+
 Route::put("/companies/{company}", [CompanyController::class, "update"]);
 
 Route::delete("/companies/{company}", [CompanyController::class, "destroy"]);
@@ -30,7 +32,12 @@ Route::post("/companies", [CompanyController::class, "store"]);
 
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
+
     Route::post("/users", [UserController::class, "store"])->middleware(
         'ability:create-department-head,create-department-employee,create-company-representative,create-student'
     );
+
+    Route::post("/logout", [UserController::class, "logout"]);
+
+    Route::get("/test", [CompanyController::class, "index"])->middleware('ability:acces-companies');
 });
