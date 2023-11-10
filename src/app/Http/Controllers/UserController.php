@@ -11,7 +11,7 @@ use App\Models\DepartmentEmployee;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller {
-    
+
     public function register(Request $request) {
         $fields = $request->validate([
             'email' => 'required|string|unique:users,email',
@@ -28,7 +28,15 @@ class UserController extends Controller {
             'role_id' => Role::firstWhere("role", "Admin")->id
         ]);
 
-        $token = $user->createToken("adminToken, ['create-department-head,create-department-employee,create-company-representative,create-student']")->plainTextToken;
+        $token = $user->createToken(
+            "adminToken",
+            [
+                "create-department-head",
+                "create-department-employee",
+                "create-company-representative",
+                "create-student"
+            ]
+        )->plainTextToken;
 
         return response(
             [
@@ -51,7 +59,7 @@ class UserController extends Controller {
         $fields['department_id'] = $request->department_id;
         $fields['company_id'] = $request->company_id;
         $fields['phone'] = $request->phone;
-     
+
         if (($fields['company_id'] !== null && $fields['department_id'] !== null)) {
             return response('can\'t send company_id and department_id together', 400);
         }
@@ -68,9 +76,9 @@ class UserController extends Controller {
 
         switch ($fields['role_id']) {
             case 2:
-                if($fields['department_id']) {
+                if ($fields['department_id']) {
                     if (auth()->user()->tokenCan('create-department-head')) {
-                        
+
                         $newUser = createUser($fields);
 
                         DepartmentEmployee::create([
@@ -79,14 +87,14 @@ class UserController extends Controller {
                         ]);
 
                         return response('User created', 201);
-                    } else return response('Unauthorized', 401);
+                    } else return response('Forbidden', 403);
                 } else return response("Missing department_id", 400);
                 break;
 
             case 3:
-                if($fields['department_id'] !== null) {
-                    if (auth()->user()->tokenCan('create-department-head')) {
-                        
+                if ($fields['department_id'] !== null) {
+                    if (auth()->user()->tokenCan('create-department-employee')) {
+
                         $newUser = createUser($fields);
 
                         DepartmentEmployee::create([
@@ -95,14 +103,14 @@ class UserController extends Controller {
                         ]);
 
                         return response('User created', 201);
-                    } else return response('Unauthorized', 401);
+                    } else return response('Forbidden', 403);
                 } else return response("Missing department_id", 400);
                 break;
 
             case 4:
-                if($fields['company_id'] !== null && $fields['phone'] !== null) {
+                if ($fields['company_id'] !== null && $fields['phone'] !== null) {
                     if (auth()->user()->tokenCan('create-company-representative')) {
-                        
+
                         $newUser = createUser($fields);
 
                         CompanyEmployee::create([
@@ -112,23 +120,100 @@ class UserController extends Controller {
                         ]);
 
                         return response('User created', 201);
-                    } else return response('Unauthorized', 401);
+                    } else return response('Forbidden', 403);
                 } else return response("Missing company_id or phone", 400);
                 break;
 
             case 5:
                 if (auth()->user()->tokenCan('create-student')) {
-                    
+
                     $newUser = createUser($fields);
 
                     return response('User created', 201);
-                } else return response('Unauthorized', 401);
+                } else return response('Forbidden', 403);
                 break;
 
             default:
                 return response('Wrong role_id', 401);
         }
+    }
 
+    public function login(Request $request) {
         
+        $fields = $request->validate([
+            'email' => 'required|string',
+            'password' => 'required|string'
+        ]);
+
+        $user = User::where('email', $fields['email'])->first();
+
+        if (!$user || !Hash::check($fields['password'], $user->password)) {
+            return response([
+                'message' => 'Incorrect credentials'
+            ], 401);
+        }
+        switch ($user->role->id) {
+            case 1:
+                $token = $user->createToken(
+                    "adminToken",
+                    [
+                        "create-department-head",
+                        "create-department-employee",
+                        "create-company-representative",
+                        "create-student"
+                    ]
+                )->plainTextToken;
+                break;
+            case 2:
+                $token = $user->createToken(
+                    "departmentHeadToken",
+                    [
+                        "create-department-employee",
+                        "create-company-representative",
+                        "create-student"
+                    ]
+                )->plainTextToken;
+                break;
+            case 3:
+                $token = $user->createToken(
+                    "departmentEmployeeToken",
+                    [
+                        "create-company-representative",
+                        "create-student"
+                    ]
+                )->plainTextToken;
+                break;
+            case 4:
+                $token = $user->createToken(
+                    "companyRepresentativeToken",[
+                        
+                    ]
+                )->plainTextToken;
+                break;
+            case 5:
+                $token = $user->createToken(
+                    "studentToken",[
+
+                    ]
+                )->plainTextToken;
+                break;
+            default:
+                return response('Wrong role_id', 401);
+        }
+
+        $response = [
+            'user' => $user,
+            'token' => $token
+        ];
+
+        return response($response, 201);
+    }
+
+    public function logout(Request $request) {
+        auth()->user()->tokens()->delete();
+
+        return [
+            'message' => 'Logged out'
+        ];
     }
 }
