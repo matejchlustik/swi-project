@@ -2,24 +2,17 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 
-class Department extends Model
+class Program extends Model
 {
     use HasFactory;
-
     protected $fillable = [
         'name',
         'short',
-        'faculty_id'
+        'major_id'
     ];
-
-    public function faculty() :BelongsTo
-    {
-        return $this->belongsTo(Faculty::class);
-    }
     public function majors() :BelongsTo
     {
         return $this->belongsTo(Majors::class);
