@@ -4,6 +4,7 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Company;
+use App\Models\Program;
 use Database\Factories\CompanyFactory;
 use Illuminate\Database\Seeder;
 use Database\Seeders\RoleSeeder;
@@ -25,6 +26,8 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             FacultySeeder::class,
             DepartmentSeeder::class,
+            MajorSeeder::class,
+            ProgramSeeder::class
         ]);
 
     }

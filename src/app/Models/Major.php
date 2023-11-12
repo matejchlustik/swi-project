@@ -2,10 +2,12 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
-class Majors extends Model
+class Major extends Model
 {
     use HasFactory;
     protected $fillable = [
@@ -17,8 +19,8 @@ class Majors extends Model
     {
         return $this->belongsTo(department::class);
     }
-    public function program() :BelongsTo
+    public function program() :HasMany
     {
-        return $this->belongsTo(program::class);
+        return $this->hasMany(program::class);
     }
 }
