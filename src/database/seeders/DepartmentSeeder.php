@@ -194,6 +194,7 @@ class DepartmentSeeder extends Seeder
                 'faculty_id'=> 5
 
             ],
+            
     
         ]);
     }

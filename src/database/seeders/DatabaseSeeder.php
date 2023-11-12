@@ -7,7 +7,9 @@ use App\Models\Company;
 use Illuminate\Database\Seeder;
 use Database\Seeders\RoleSeeder;
 use Database\Seeders\UserSeeder;
+use Database\Seeders\MajorSeeder;
 use Database\Seeders\FacultySeeder;
+use Database\Seeders\ProgramSeeder;
 use Database\Seeders\DepartmentSeeder;
 
 
@@ -25,6 +27,8 @@ class DatabaseSeeder extends Seeder
             RoleSeeder::class,
             FacultySeeder::class,
             DepartmentSeeder::class,
+            MajorSeeder::class,
+            ProgramSeeder::class,
             UserSeeder::class
         ]);
 
