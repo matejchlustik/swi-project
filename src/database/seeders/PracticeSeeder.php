@@ -21,7 +21,7 @@ class PracticeSeeder extends Seeder
             $start_date_end = "2023/05/01";
             $end_date_end = "2023/05/31";
             $to = mt_rand(strtotime($start_date_end), strtotime($end_date_end));
-$add;
+
 
             DB::table('practices')->insert([
                 [
