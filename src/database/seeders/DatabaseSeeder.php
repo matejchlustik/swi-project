@@ -29,7 +29,8 @@ class DatabaseSeeder extends Seeder
             DepartmentSeeder::class,
             MajorSeeder::class,
             ProgramSeeder::class,
-            UserSeeder::class
+            UserSeeder::class,
+            PracticeSeeder::class
         ]);
 
     }
