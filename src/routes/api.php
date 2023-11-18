@@ -1,8 +1,13 @@
 <?php
 
+use App\Models\User;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use Illuminate\Support\Facades\Password;
+use Illuminate\Auth\Events\PasswordReset;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmailVerificationController;
 
@@ -31,6 +36,11 @@ Route::get("/companies/{company}", [CompanyController::class, "show"]);
 
 Route::post("/companies", [CompanyController::class, "store"]);
 
+Route::post('/forgot-password', [UserController::class, "forgotPassword"])->name('password.email');
+
+Route::get('/reset-password/{token}', [UserController::class, "resetToken"])->name('password.reset');
+
+Route::post('/reset-password', [UserController::class, "passwordReset"])->name('password.update');
 
 //Routes accesible only with token
 Route::group(['middleware' => ['auth:sanctum']], function () {
@@ -42,6 +52,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/email/verification-notification', [EmailVerificationController::class, "resend"])->name('verification.send');
 
     Route::post("/logout", [UserController::class, "logout"]);
+
+    Route::post('/change-password', [UserController::class, "changePassword"]);
 
     //Routes accesible only if email is verified
     Route::group(['middleware' => ['verified']], function () {

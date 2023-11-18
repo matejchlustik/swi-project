@@ -11,10 +11,15 @@
 @endif
 
 {{-- Intro Lines --}}
-@lang(
-    "Please verify your email address by sending a get request to the URL below with your token",
-) <span class="break-all">[{{ $displayableActionUrl }}]({{ $actionUrl }})</span>
+@foreach ($introLines as $line)
+{{ $line }}
 
+@endforeach
+
+{{-- Action Button --}}
+@isset($actionText)
+<span class="break-all">[{{ $displayableActionUrl }}]({{ $actionUrl }})</span>
+@endisset
 
 {{-- Outro Lines --}}
 @foreach ($outroLines as $line)
@@ -29,4 +34,5 @@
 @lang('Regards'),<br>
 {{ config('app.name') }}
 @endif
+
 </x-mail::message>
