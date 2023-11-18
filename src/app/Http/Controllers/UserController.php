@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Mail\Test;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -9,6 +10,8 @@ use Illuminate\Http\Response;
 use App\Models\CompanyEmployee;
 use App\Models\DepartmentEmployee;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Auth\Events\Registered;
 
 class UserController extends Controller {
 
@@ -25,16 +28,15 @@ class UserController extends Controller {
             'first_name' => $fields['first_name'],
             'email' => $fields['email'],
             'password' => Hash::make($fields['password']),
-            'role_id' => Role::firstWhere("role", "Admin")->id
+            'role_id' => Role::firstWhere("role", "Študent")->id
         ]);
 
+        event(new Registered($user));
+
         $token = $user->createToken(
-            "adminToken",
+            "studentToken",
             [
-                "create-department-head",
-                "create-department-employee",
-                "create-company-representative",
-                "create-student"
+
             ]
         )->plainTextToken;
 
@@ -85,12 +87,11 @@ class UserController extends Controller {
                             'user_id' => $newUser->id,
                             'department_id' => $fields['department_id']
                         ]);
-
+                        $newUser->markEmailAsVerified();
                         return response('User created', 201);
                     } else return response('Forbidden', 403);
                 } else return response("Missing department_id", 400);
                 break;
-
             case 3:
                 if ($fields['department_id'] !== null) {
                     if (auth()->user()->tokenCan('create-department-employee')) {
@@ -101,12 +102,11 @@ class UserController extends Controller {
                             'user_id' => $newUser->id,
                             'department_id' => $fields['department_id']
                         ]);
-
+                        $newUser->markEmailAsVerified();
                         return response('User created', 201);
                     } else return response('Forbidden', 403);
                 } else return response("Missing department_id", 400);
                 break;
-
             case 4:
                 if ($fields['company_id'] !== null && $fields['phone'] !== null) {
                     if (auth()->user()->tokenCan('create-company-representative')) {
@@ -118,21 +118,19 @@ class UserController extends Controller {
                             'company_id' => $fields['company_id'],
                             'phone' => $fields['phone']
                         ]);
-
+                        $newUser->markEmailAsVerified();
                         return response('User created', 201);
                     } else return response('Forbidden', 403);
                 } else return response("Missing company_id or phone", 400);
                 break;
-
             case 5:
                 if (auth()->user()->tokenCan('create-student')) {
 
                     $newUser = createUser($fields);
-
+                    $newUser->markEmailAsVerified();
                     return response('User created', 201);
                 } else return response('Forbidden', 403);
                 break;
-
             default:
                 return response('Wrong role_id', 401);
         }
