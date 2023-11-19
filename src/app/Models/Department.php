@@ -25,4 +25,8 @@ class Department extends Model
     {
         return $this->hasMany(Majors::class);
     }
+    public function companies()
+    {
+        return $this->belongsToMany(Company::class, 'company_department', 'department_id', 'company_id');
+    }
 }

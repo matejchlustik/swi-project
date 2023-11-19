@@ -16,4 +16,13 @@ class CompanyEmployee extends Model
     ];
 
     public $timestamps = false;
+
+    public function company()
+    {
+        return $this->belongsTo(Company::class);
+    }
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
 }
