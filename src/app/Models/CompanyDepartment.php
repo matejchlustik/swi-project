@@ -4,13 +4,14 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Pivot;
 
-class CompanyDepartment extends Model
+class CompanyDepartment extends Pivot
 {
-    protected $table = 'company_department';
+    use HasFactory;
 
 
-    public function practiceOffers()
+    public function practiceOffers(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
         return $this->hasMany(PracticeOffers::class);
     }

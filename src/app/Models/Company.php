@@ -12,7 +12,8 @@ class Company extends Model
     protected $guarded = ['id'];
     public function departments()
     {
-        return $this->belongsToMany(Department::class, 'company_department', 'company_id', 'department_id');
+        return $this->belongsToMany(Department::class)->using(CompanyDepartment::class);
+        //return $this->belongsToMany(Department::class, 'company_department', 'company_id', 'department_id');
     }
     public function companyEmployee()
     {

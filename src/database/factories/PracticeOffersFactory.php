@@ -20,7 +20,8 @@ class PracticeOffersFactory extends Factory
             'phone' => $this->faker->phoneNumber,
             'email' => $this->faker->safeEmail,
             'company_department_id' => function () {
-                return CompanyDepartment::factory()->create()->id;
+                return rand(1, 30);
+            //return CompanyDepartment::factory()->create()->id;
             },
         ];
     }

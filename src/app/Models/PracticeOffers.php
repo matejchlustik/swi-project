@@ -7,9 +7,9 @@ use Illuminate\Database\Eloquent\Model;
 
 class PracticeOffers extends Model
 {
-    protected $fillable = ['description', 'phone', 'email', 'company_department_id'];
+    use HasFactory;
 
-    public function companyDepartment()
+    public function companyDepartment(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(CompanyDepartment::class);
     }
