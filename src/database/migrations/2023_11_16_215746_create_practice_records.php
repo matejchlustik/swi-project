@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->date('from');
             $table->date('to');
-            $table->string('TEXT',45);
-            $table->tinyInteger('hours');
+            $table->string('description');
+            $table->integer('hours');
             $table->foreignId('practice_id')->constrained();
             $table->timestamps();
         });

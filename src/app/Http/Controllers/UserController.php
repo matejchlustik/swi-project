@@ -139,7 +139,7 @@ class UserController extends Controller {
     }
 
     public function login(Request $request) {
-        
+
         $fields = $request->validate([
             'email' => 'required|string',
             'password' => 'required|string'
@@ -186,14 +186,21 @@ class UserController extends Controller {
             case 4:
                 $token = $user->createToken(
                     "companyRepresentativeToken",[
-                        
+
                     ]
                 )->plainTextToken;
                 break;
             case 5:
                 $token = $user->createToken(
                     "studentToken",[
-
+                        "access-records",
+                        "create-record",
+                        "update-record",
+                        "delete-record",
+                        "access-practices",
+                        "create-practice",
+                        "update-practice",
+                        "delete-practice"
                     ]
                 )->plainTextToken;
                 break;
