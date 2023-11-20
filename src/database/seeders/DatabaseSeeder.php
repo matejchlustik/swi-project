@@ -4,6 +4,9 @@ namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Company;
+use App\Models\CompanyEmployee;
+use App\Models\Practice;
+use App\Models\PracticeRecord;
 use Illuminate\Database\Seeder;
 use Database\Seeders\RoleSeeder;
 use Database\Seeders\UserSeeder;
@@ -29,8 +32,11 @@ class DatabaseSeeder extends Seeder
             DepartmentSeeder::class,
             MajorSeeder::class,
             ProgramSeeder::class,
-            UserSeeder::class
+            UserSeeder::class,
         ]);
 
+        CompanyEmployee::factory(1)->create();
+        Practice::factory(1)->create();
+        PracticeRecord::factory(10)->create();
     }
 }

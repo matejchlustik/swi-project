@@ -1,15 +1,11 @@
 <?php
 
-use App\Models\User;
-use Illuminate\Support\Str;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Auth\Events\PasswordReset;
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmailVerificationController;
+use App\Http\Controllers\PracticeController;
+use App\Http\Controllers\PracticeRecordsController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,6 +58,29 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             'ability:create-department-head,create-department-employee,create-company-representative,create-student'
         );
 
+        Route::group(['middleware' => ["ability:read-practices"]], function () {
+
+            Route::get('/practice_records/{practice}', [PracticeRecordsController::class, "index"]);
+    
+            Route::get('/practices', [PracticeController::class, "index"]);
+    
+            Route::get('/practices/{practice}', [PracticeController::class, "show"]);
+        });
+        Route::group(['middleware' => ["ability:manage-practices"]], function () {
+    
+            Route::post('/practice_records', [PracticeRecordsController::class, "store"]);
+        
+            Route::put('/practice_records/{practice_record}', [PracticeRecordsController::class, "update"]);
+        
+            Route::delete('/practice_records/{practice_record}', [PracticeRecordsController::class, "destroy"]);
+    
+            Route::post('/practices', [PracticeController::class, "store"]);
+        
+            Route::put('/practices/{practice}', [PracticeController::class, "update"]);
+        
+            Route::delete('/practices/{practice}', [PracticeController::class, "destroy"]);
+        });
+    
     });
 
 });
