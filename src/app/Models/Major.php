@@ -17,10 +17,10 @@ class Major extends Model
 
     public function department() :BelongsTo
     {
-        return $this->belongsTo(department::class);
+        return $this->belongsTo(Department::class);
     }
     public function program() :HasMany
     {
-        return $this->hasMany(program::class);
+        return $this->hasMany(Program::class);
     }
 }

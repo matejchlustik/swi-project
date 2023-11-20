@@ -30,25 +30,48 @@ class PracticeController extends Controller
 
     public function index()
     {
-        //return response(auth()->user()->role);
-        $Practice = Practice::where('user_id', auth()->id())->paginate(10);
+
+        $practices = [];
+        if(auth()->user()->role->role === "Študent") {
+            $practices = Practice::where('user_id', auth()->id())->paginate(10);
+        } else if(auth()->user()->role->role === "Zástupca firmy") {
+            $practices = Practice::where('company_employee_id', auth()->user()->companyEmployee->id)->paginate(10);
+        } else {
+            $practices = Practice::paginate(10);
+        }
 
         return response([
-            'items' => $Practice->items(),
-            'prev_page_url' =>$Practice->previousPageUrl(),
-            'next_page_url' => $Practice->nextPageUrl(),
-            'last_page' =>$Practice->lastPage(),
-            'total' => $Practice->total()
+            'items' => $practices->items(),
+            'prev_page_url' =>$practices->previousPageUrl(),
+            'next_page_url' => $practices->nextPageUrl(),
+            'last_page' =>$practices->lastPage(),
+            'total' => $practices->total()
         ]);
     }
 
-    public function show(Practice $Practice)
+    public function show(Practice $practice)
     {
-        return response()->json($Practice);
+        if(auth()->user()->role->role === "Študent" || auth()->user()->role->role === "Zástupca firmy") {
+            if($practice->user_id === auth()->id()) {
+                return response ($practice->load(["companyEmployee.company","companyEmployee.user","program"]));
+            } else if(auth()->user()->companyEmployee->id === $practice->companyEmployee->id) {
+                return response ($practice->load(["companyEmployee.company","companyEmployee.user","program"]));
+            } else {
+                return response("Forbidden", 403);
+            }
+        }
+        
+        return response()->json($practice->load(["companyEmployee.company","companyEmployee.user"]));
     }
 
     public function update(Practice $practice, Request $request)
     {
+        if(auth()->user()->role->role === "Študent") {
+            if($practice->user_id !== auth()->id()) {
+                return response ("Forbidden", 403);
+            } 
+        }
+
         $practice->fill($request->all());
         $practice->save();
 
@@ -57,6 +80,12 @@ class PracticeController extends Controller
 
     public function destroy(Practice $practice)
     {
+        if(auth()->user()->role->role === "Študent") {
+            if($practice->user_id !== auth()->id()) {
+                return response ("Forbidden", 403);
+            } 
+        }
+
         $practice->delete();
 
         return response()->json([

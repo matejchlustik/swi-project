@@ -25,51 +25,38 @@ class PracticeRecordsController extends Controller
         ]);
     }
 
-    public function show(PracticeRecord $practiceRecord)
-    {
-        //zamestnanec vidiet svojej firmy
-        //student vidiet svoje
-        //ostatni vidiet vsetko
-        $Role = auth()->user()->role;
-
-        if($Role->role == "Admin"){
-            return response()->json($practiceRecord);
-        }
-        if($Role->role == "Vedúci pracoviska"){
-            return response()->json($practiceRecord);
-        }
-        if($Role->role == "Poverený pracovník pracoviska"){
-            return response()->json($practiceRecord);
-        }
-        if($Role->role == "Zástupca firmy"){
-            return response()->json($practiceRecord);
-        }
-        if($Role->role == "Študent"){
-            //$practice = Practice::find($practiceRecord->practice_id)->where('user_id', auth()->id())->get();
-            //$practiceRecord = PracticeRecord::where('practice_id',$practice->id)->get();
-            return response()->json($practiceRecord);
+    public function index(Practice $practice){
+        if(auth()->user()->role->role === "Študent") {
+            if($practice->user_id != auth()->id()) {
+                return response ("Forbidden", 403);
+            } 
         }
 
+        if(auth()->user()->role->role === "Zástupca firmy") {
+            if($practice->companyEmployee->id != auth()->user()->companyEmployee->id) {
+                return response ("Forbidden", 403);
+            } 
+        }
 
-        else return response()->json([
-            'message' => 'Missing role error.',
-        ]);
-    }
-
-    public function index(){
-        $practiceRecord = PracticeRecord::paginate(10);
+        $practiceRecords = PracticeRecord::where('practice_id', $practice->id)->paginate(10);
 
         return response([
-            'items' => $practiceRecord->items(),
-            'prev_page_url' =>$practiceRecord->previousPageUrl(),
-            'next_page_url' => $practiceRecord->nextPageUrl(),
-            'last_page' =>$practiceRecord->lastPage(),
-            'total' => $practiceRecord->total()
+            'items' => $practiceRecords->items(),
+            'prev_page_url' =>$practiceRecords->previousPageUrl(),
+            'next_page_url' => $practiceRecords->nextPageUrl(),
+            'last_page' =>$practiceRecords->lastPage(),
+            'total' => $practiceRecords->total()
         ]);
     }
 
     public function update(PracticeRecord $practiceRecord, Request $request)
     {
+        if(auth()->user()->role->role === "Študent") {
+            if($practiceRecord->practice->user_id != auth()->id()) {
+                return response ("Forbidden", 403);
+            } 
+        }
+
         $practiceRecord->fill($request->all());
         $practiceRecord->save();
 
@@ -78,6 +65,13 @@ class PracticeRecordsController extends Controller
 
     public function destroy(PracticeRecord $practiceRecord)
     {
+
+        if(auth()->user()->role->role === "Študent") {
+            if($practiceRecord->practice->user_id != auth()->id()) {
+                return response ("Forbidden", 403);
+            } 
+        }
+        
         $practiceRecord->delete();
 
         return response()->json([

@@ -33,8 +33,6 @@ Route::get("/companies/{company}", [CompanyController::class, "show"]);
 Route::post("/companies", [CompanyController::class, "store"]);
 
 
-
-
 Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::post("/users", [UserController::class, "store"])->middleware(
@@ -43,28 +41,28 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::post("/logout", [UserController::class, "logout"]);
 
-    Route::get("/test", [CompanyController::class, "index"])->middleware('ability:acces-companies');
+    Route::group(['middleware' => ["ability:read-practices"]], function () {
 
+        Route::get('/practice_records/{practice}', [PracticeRecordsController::class, "index"]);
 
-    Route::get('/practice_records', [PracticeRecordsController::class, "index"])->middleware('ability:access-records');
+        Route::get('/practices', [PracticeController::class, "index"]);
 
-    Route::get('/practice_records/{practice_record}', [PracticeRecordsController::class, "show"])->middleware('ability:access-records');
+        Route::get('/practices/{practice}', [PracticeController::class, "show"]);
+    });
+    Route::group(['middleware' => ["ability:manage-practices"]], function () {
 
-    Route::post('/practice_records', [PracticeRecordsController::class, "store"])->middleware('ability:create-record');
+        Route::post('/practice_records', [PracticeRecordsController::class, "store"]);
+    
+        Route::put('/practice_records/{practice_record}', [PracticeRecordsController::class, "update"]);
+    
+        Route::delete('/practice_records/{practice_record}', [PracticeRecordsController::class, "destroy"]);
 
-    Route::put('/practice_records/{practice_record}', [PracticeRecordsController::class, "update"])->middleware('ability:update-record');
+        Route::post('/practices', [PracticeController::class, "store"]);
+    
+        Route::put('/practices/{practice}', [PracticeController::class, "update"]);
+    
+        Route::delete('/practices/{practice}', [PracticeController::class, "destroy"]);
+    });
 
-    Route::delete('/practice_records/{practice_record}', [PracticeRecordsController::class, "destroy"])->middleware('ability:delete-record');
-
-
-    Route::get('/practices', [PracticeController::class, "index"])->middleware('ability:access-practices');
-
-    Route::get('/practices/{practice}', [PracticeController::class, "show"])->middleware('ability:access-practices');
-
-    Route::post('/practices', [PracticeController::class, "store"])->middleware('ability:create-practice');
-
-    Route::put('/practices/{practice}', [PracticeController::class, "update"])->middleware('ability:update-practice');
-
-    Route::delete('/practices/{practice}', [PracticeController::class, "destroy"])->middleware('ability:delete-practice');
 
 });

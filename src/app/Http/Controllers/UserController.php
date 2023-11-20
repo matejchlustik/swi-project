@@ -160,7 +160,9 @@ class UserController extends Controller {
                         "create-department-head",
                         "create-department-employee",
                         "create-company-representative",
-                        "create-student"
+                        "create-student",
+                        "manage-practices",
+                        "read-practices",
                     ]
                 )->plainTextToken;
                 break;
@@ -170,7 +172,9 @@ class UserController extends Controller {
                     [
                         "create-department-employee",
                         "create-company-representative",
-                        "create-student"
+                        "create-student",
+                        "manage-practices",
+                        "read-practices",
                     ]
                 )->plainTextToken;
                 break;
@@ -179,28 +183,24 @@ class UserController extends Controller {
                     "departmentEmployeeToken",
                     [
                         "create-company-representative",
-                        "create-student"
+                        "create-student",
+                        "manage-practices",
+                        "read-practices",
                     ]
                 )->plainTextToken;
                 break;
             case 4:
                 $token = $user->createToken(
                     "companyRepresentativeToken",[
-
+                        "read-practices",
                     ]
                 )->plainTextToken;
                 break;
             case 5:
                 $token = $user->createToken(
                     "studentToken",[
-                        "access-records",
-                        "create-record",
-                        "update-record",
-                        "delete-record",
-                        "access-practices",
-                        "create-practice",
-                        "update-practice",
-                        "delete-practice"
+                        "manage-practices",
+                        "read-practices"
                     ]
                 )->plainTextToken;
                 break;

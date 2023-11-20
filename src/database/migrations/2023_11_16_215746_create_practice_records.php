@@ -17,7 +17,7 @@ return new class extends Migration
             $table->date('to');
             $table->string('description');
             $table->integer('hours');
-            $table->foreignId('practice_id')->constrained();
+            $table->foreignId('practice_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });
     }
