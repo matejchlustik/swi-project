@@ -20,7 +20,7 @@ class CompanyEmployee extends Model
 
     public $timestamps = false;
 
-    public function practices() :HasMany
+    public function practice() :HasMany
     {
         return $this->hasMany(Practice::class);
     }

@@ -14,7 +14,7 @@ class Program extends Model
         'short',
         'major_id'
     ];
-    public function majors() :BelongsTo
+    public function major() :BelongsTo
     {
         return $this->belongsTo(Majors::class);
     }

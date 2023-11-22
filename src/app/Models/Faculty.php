@@ -10,7 +10,7 @@ class Faculty extends Model
 {
     use HasFactory;
 
-    public function departments() :HasMany
+    public function department() :HasMany
     {
         return $this->hasMany(Department::class);
     }

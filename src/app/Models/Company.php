@@ -12,7 +12,7 @@ class Company extends Model
 
     protected $guarded = ['id'];
 
-    public function companyEmployees() :HasMany
+    public function companyEmployee() :HasMany
     {
         return $this->hasMany(CompanyEmployee::class);
     }

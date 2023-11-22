@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CompanyController;
@@ -57,30 +58,46 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post("/users", [UserController::class, "store"])->middleware(
             'ability:create-department-head,create-department-employee,create-company-representative,create-student'
         );
+        Route::group(['middleware' => ['verified', 'ability:manage-comments']], function () {
+
+                Route::post('/comments', [CommentController::class, 'store']);
+
+                Route::put('/comments/{comment}', [CommentController::class, 'update']);
+
+                Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
+        });
+        Route::group(['middleware' => ['verified', 'ability:read-comments']], function () {
+
+            Route::get('/comments', [CommentController::class, 'index']);
+
+            Route::get('/comments/practice/{practiceId}', [CommentController::class, 'getCommentsByPracticeId']);
+
+            Route::get('/comments/user/{userId}', [CommentController::class, 'getCommentsByUserId']);
+        });
 
         Route::group(['middleware' => ["ability:read-practices"]], function () {
 
             Route::get('/practice_records/{practice}', [PracticeRecordsController::class, "index"]);
-    
+
             Route::get('/practices', [PracticeController::class, "index"]);
-    
+
             Route::get('/practices/{practice}', [PracticeController::class, "show"]);
         });
         Route::group(['middleware' => ["ability:manage-practices"]], function () {
-    
+
             Route::post('/practice_records', [PracticeRecordsController::class, "store"]);
-        
+
             Route::put('/practice_records/{practice_record}', [PracticeRecordsController::class, "update"]);
-        
+
             Route::delete('/practice_records/{practice_record}', [PracticeRecordsController::class, "destroy"]);
-    
+
             Route::post('/practices', [PracticeController::class, "store"]);
-        
+
             Route::put('/practices/{practice}', [PracticeController::class, "update"]);
-        
+
             Route::delete('/practices/{practice}', [PracticeController::class, "destroy"]);
         });
-    
+
     });
 
 });
