@@ -5,7 +5,7 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\Company;
 use App\Models\CompanyDepartment;
-use App\Models\PracticeOffers;
+use App\Models\PracticeOffer;
 use Illuminate\Database\Seeder;
 use Database\Seeders\RoleSeeder;
 use Database\Seeders\UserSeeder;
@@ -34,6 +34,6 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class
         ]);
         CompanyDepartment::factory(30)->create();
-        PracticeOffers::factory(10)->create();
+        PracticeOffer::factory(10)->create();
     }
 }

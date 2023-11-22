@@ -10,9 +10,14 @@ class CompanyDepartment extends Pivot
 {
     use HasFactory;
 
+    protected $fillable = [
+        'departments_id',
+        'companies_id',
 
+    ];
     public function practiceOffers(): \Illuminate\Database\Eloquent\Relations\HasMany
     {
-        return $this->hasMany(PracticeOffers::class);
+        return $this->hasMany(PracticeOffer::class);
     }
+
 }

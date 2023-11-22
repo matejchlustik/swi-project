@@ -139,7 +139,7 @@ class UserController extends Controller {
     }
 
     public function login(Request $request) {
-        
+
         $fields = $request->validate([
             'email' => 'required|string',
             'password' => 'required|string'
@@ -160,7 +160,9 @@ class UserController extends Controller {
                         "create-department-head",
                         "create-department-employee",
                         "create-company-representative",
-                        "create-student"
+                        "create-student",
+                        "ability:read-practice_offers",
+                        "ability:manage-practice_offers"
                     ]
                 )->plainTextToken;
                 break;
@@ -170,7 +172,9 @@ class UserController extends Controller {
                     [
                         "create-department-employee",
                         "create-company-representative",
-                        "create-student"
+                        "create-student",
+                        "ability:read-practice_offers",
+                        "ability:manage-practice_offers"
                     ]
                 )->plainTextToken;
                 break;
@@ -179,21 +183,24 @@ class UserController extends Controller {
                     "departmentEmployeeToken",
                     [
                         "create-company-representative",
-                        "create-student"
+                        "create-student",
+                        "ability:read-practice_offers",
+                        "ability:manage-practice_offers"
                     ]
                 )->plainTextToken;
                 break;
             case 4:
                 $token = $user->createToken(
                     "companyRepresentativeToken",[
-                        
+                        "ability:read-practice_offers",
+                        "ability:manage-practice_offers"
                     ]
                 )->plainTextToken;
                 break;
             case 5:
                 $token = $user->createToken(
                     "studentToken",[
-
+                        "ability:read-practice_offers"
                     ]
                 )->plainTextToken;
                 break;
@@ -219,11 +226,11 @@ class UserController extends Controller {
 
     public function forgotPassword(Request $request) {
         $request->validate(['email' => 'required|email']);
- 
+
         $status = Password::sendResetLink(
             $request->only('email')
         );
-     
+
         return $status === Password::RESET_LINK_SENT
                     ? response(['status' => __($status)])
                     : response(['email' => __($status)]);
@@ -239,20 +246,20 @@ class UserController extends Controller {
             'email' => 'required|email',
             'password' => 'required|confirmed',
         ]);
-     
+
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (User $user, string $password) {
                 $user->forceFill([
                     'password' => Hash::make($password)
                 ]);
-     
+
                 $user->save();
-     
+
                 event(new PasswordReset($user));
             }
         );
-     
+
         return $status === Password::PASSWORD_RESET
                     ? response(['status' => __($status)])
                     : response(['email' => __($status)]);

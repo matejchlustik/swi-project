@@ -3,15 +3,15 @@
 namespace Database\Factories;
 
 use App\Models\CompanyDepartment;
-use App\Models\PracticeOffers;
+use App\Models\PracticeOffer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PracticeOffers>
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PracticeOffer>
  */
 class PracticeOffersFactory extends Factory
 {
-    protected $model = PracticeOffers::class;
+    protected $model = PracticeOffer::class;
 
     public function definition()
     {

@@ -8,6 +8,7 @@ use App\Notifications\ResetPassword;
 use App\Notifications\VerifyEmail;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -50,10 +51,7 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-    public function companyEmployee()
-    {
-        return $this->hasMany(CompanyEmployee::class);
-    }
+
     public function sendPasswordResetNotification($token)
     {
         // Your your own implementation.
@@ -68,5 +66,13 @@ class User extends Authenticatable implements MustVerifyEmail
     public function role() :BelongsTo
     {
         return $this->belongsTo(Role::class);
+    }
+    public function companyEmployee() :HasOne
+    {
+        return $this->hasOne(CompanyEmployee::class);
+    }
+    public function departmentEmployee() :HasOne
+    {
+        return $this->hasOne(DepartmentEmployee::class);
     }
 }
