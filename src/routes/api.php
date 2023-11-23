@@ -60,7 +60,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
         Route::group(['middleware' => ["ability:read-practices"]], function () {
 
-            Route::get('/practice_records/{practice}', [PracticeRecordsController::class, "index"]);
+            Route::get('/practice_records/practices/{practice}', [PracticeRecordsController::class, "index"]);
     
             Route::get('/practices', [PracticeController::class, "index"]);
     
