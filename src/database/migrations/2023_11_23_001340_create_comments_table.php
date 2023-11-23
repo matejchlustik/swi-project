@@ -16,8 +16,8 @@ class CreateCommentsTable extends Migration
         Schema::create('comments', function (Blueprint $table) {
             $table->id();
             $table->text('body');
+            $table->foreignId('practice_id')->constrained('practices');
             $table->foreignId('user_id')->constrained('users');
-            $table->foreignId('practice_offer_id')->constrained('practice_offers');
             $table->timestamps();
         });
     }
@@ -27,7 +27,7 @@ class CreateCommentsTable extends Migration
      *
      * @return void
      */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('comments');
     }
