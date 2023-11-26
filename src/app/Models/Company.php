@@ -31,7 +31,7 @@ class Company extends Model
     }
     public function practiceOffers()
     {
-        return $this->hasManyThrough(PracticeOffer::class, CompanyDepartment::class);
+        return $this->hasManyThrough(PracticeOffer::class, CompanyDepartment::class,"company_id","company_department_id","id","id");
     }
 
 }

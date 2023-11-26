@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Company;
 use App\Models\CompanyDepartment;
 use App\Models\Department;
 use App\Models\PracticeOffer;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 
 class PracticeOffersController extends Controller
 {
@@ -22,103 +24,63 @@ class PracticeOffersController extends Controller
         ]);
     }
 
-    public function show(PracticeOffer $practiceOffers)
+    public function show(PracticeOffer $practiceOffer)
     {
-        return response()->json($practiceOffers);
+        return response()->json($practiceOffer->load(["companyDepartment.company","companyDepartment.department"]));
     }
 
     public function store(Request $request)
     {
         $validatedData = $request->validate([
             'description' => 'required',
-            'phone' => 'required|max:15',
+            'phone' => 'required',
             'email' => 'required|email',
-            'company_department_id' => 'required|exists:company_department,id',
+            'company_department_id' => 'required|exists:company_department,id'
         ]);
         $practiceOffer = PracticeOffer::create($validatedData);
 
         return response()->json($practiceOffer);
     }
-    public function showByDepartment($departmentId)
+    public function showByDepartment(Department $department)
     {
-        $practiceOffers = PracticeOffer::whereHas('companyDepartment', function ($query) use ($departmentId) {
-            $query->where('department_id', $departmentId);
-        })->get();
-            return response()->json([
-                'practiceOffers' => $practiceOffers->map(function ($practiceOffer) {
-                    return [
-                        'id' => $practiceOffer->id,
-                        'description' => $practiceOffer->description,
-                        'phone' => $practiceOffer->phone,
-                        'email' => $practiceOffer->email,
-                        'company' => $practiceOffer->companyDepartment->company,
-                        'department' => $practiceOffer->companyDepartment->department,
-                    ];
-                }),
-            ]);
-       // return response($department->practiceOffers);
+        $practiceOffers=Department::find($department->id)->practiceOffers()->paginate(10) ;
+        return response($practiceOffers);
         }
 
-    public function showByCompany($companyId)
+    public function showByCompany(Company $company)
     {
-        $practiceOffers = PracticeOffer::whereHas('companyDepartment', function ($query) use ($companyId) {
-            $query->where('companies_id', $companyId);
-        })->get();
-
-        return response()->json([
-            'practiceOffers' => $practiceOffers->map(function ($practiceOffer) {
-                return [
-                    'id' => $practiceOffer->id,
-                    'description' => $practiceOffer->description,
-                    'phone' => $practiceOffer->phone,
-                    'email' => $practiceOffer->email,
-                    'company' => $practiceOffer->companyDepartment->company,
-                    'department' => $practiceOffer->companyDepartment->department,
-                ];
-            }),
-        ]);
+        $practiceOffers=Company::find($company->id)->practiceOffers()->paginate(10) ;
+        return response($practiceOffers);
     }
 
-    public function update(Request $request, PracticeOffer $practiceOffers)
+    public function update(PracticeOffer $practiceOffer,Request $request)
     {
-        $practiceOffer = PracticeOffer::findOrFail($practiceOffers);
-        $user = $request->attributes->get('authenticated_user');
-        $companyId = Auth::user()->companyEmployees->where('company_id', $practiceOffer->company_department->company_id)->first()->company_id;
-        if ($user->role->name === 'Študent'){
-            return response ("Forbidden", 403);
-        }
-        if (!$companyId) {
-            return response ("Forbidden", 403);
-        }
-        else{
-            $validatedData = $request->validate([
-                'description' => 'required',
-                'phone' => 'required|max:30',
-                'email' => 'required|email',
-                'company_department_id' => 'required|exists:company_department,id',
-            ]);
+// Ak je používateľ zástupcom firmy, ktorá ponúka prax, môže ju upraviť alebo vymazať.
+     /*   if (auth()->user()->role->role === "Zástupca firmy") {
+            // Ak používateľ nie je zamestnancom spoločnosti, ktorá ponúka prax, vráti chybu.
+            if (auth()->user()->companyEmployees->company->id !== $practiceOffer->companyDepartment->company_id) {
+                return response("Forbidden", 403);
+            }
+        }*/
 
-            $practiceOffer->update($validatedData);
+        $practiceOffer->fill($request->all());
+        $practiceOffer->save();
 
-            return response()->json($practiceOffer);
-        }
+        return response()->json($practiceOffer);
     }
 
-    public function destroy(Request $request, PracticeOffer $practiceOffers)
+    public function destroy( PracticeOffer $practiceOffer,Request $request)
     {
-        $practiceOffer = PracticeOffer::findOrFail($practiceOffers);
-        $user = $request->attributes->get('authenticated_user');
-        $companyId = Auth::user()->companyEmployees->where('company_id', $practiceOffer->company_department->company_id)->first()->company_id;
-        if ($user->role->name === 'Študent'){
-            return response ("Forbidden", 403);
-        }
-        if (!$companyId) {
-            return response ("Forbidden", 403);
-        }
-        else{
 
+// Ak je používateľ zástupcom firmy, ktorá ponúka prax, môže ju upraviť alebo vymazať.
+        if (auth()->user()->role->role === "Zástupca firmy") {
+            // Ak používateľ nie je zamestnancom spoločnosti, ktorá ponúka prax, vráti chybu.
+            if (auth()->user()->companyEmployee->company->id !== $practiceOffer->companyDepartment->company_id) {
+                return response("Forbidden", 403);
+            }
+        }
+            $practiceOffer->delete();
             return response()->json(['message' => 'Úspěšně smazáno']);
-        }
     }
 
 }

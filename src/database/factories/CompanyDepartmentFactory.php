@@ -17,10 +17,10 @@ class CompanyDepartmentFactory extends Factory
     public function definition(): array
     {
         return [
-            'companies_id' => function () {
+            'company_id' => function () {
                 return rand(1, 30);
             },
-            'departments_id' => function () {
+            'department_id' => function () {
                 return rand(1, 30);
             },
         ];

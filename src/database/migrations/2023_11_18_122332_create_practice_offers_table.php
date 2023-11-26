@@ -14,11 +14,11 @@ return new class extends Migration
         Schema::create('practice_offers', function (Blueprint $table) {
             $table->id();
             $table->text('description');
-            $table->string('phone', 15);
-            $table->string('email', 45);
+            $table->string('phone');
+            $table->string('email');
             $table->unsignedBigInteger('company_department_id');
             $table->timestamps();
-            $table->foreign('company_department_id')->references('id')->on('company_department');
+            $table->foreign('company_department_id')->references('id')->on('company_department')->onDelete("cascade");
         });
     }
 

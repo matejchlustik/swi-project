@@ -12,15 +12,11 @@ class PracticeOffer extends Model
         'description',
         'phone',
         'email',
-        'company_department_id',
+        'company_department_id'
     ];
     public function companyDepartment(): \Illuminate\Database\Eloquent\Relations\BelongsTo
     {
         return $this->belongsTo(CompanyDepartment::class);
-    }
-    public function practiceOffers()
-    {
-        return $this->hasManyThrough(PracticeOffer::class, CompanyDepartment::class,"department_id","company_department_id","id","id");
     }
 
 }

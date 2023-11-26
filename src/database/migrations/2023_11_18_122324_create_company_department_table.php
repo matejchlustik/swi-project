@@ -13,11 +13,11 @@ return new class extends Migration
     {
         Schema::create('company_department', function (Blueprint $table) {
             $table->id(); // auto increment id
-            $table->unsignedBigInteger('departments_id');
-            $table->unsignedBigInteger('companies_id');
+            $table->unsignedBigInteger('department_id');
+            $table->unsignedBigInteger('company_id');
             $table->timestamps();
-            $table->foreign('departments_id')->references('id')->on('departments');
-            $table->foreign('companies_id')->references('id')->on('companies');
+            $table->foreign('department_id')->references('id')->on('departments')->onDelete("cascade");
+            $table->foreign('company_id')->references('id')->on('companies')->onDelete("cascade");
         });
     }
 

@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Factories\Factory;
 /**
  * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\PracticeOffer>
  */
-class PracticeOffersFactory extends Factory
+class PracticeOfferFactory extends Factory
 {
     protected $model = PracticeOffer::class;
 

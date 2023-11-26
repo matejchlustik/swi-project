@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CompanyDepartmentController;
 use App\Http\Controllers\PracticeOffersController;
 use App\Models\PracticeOffer;
 use App\Models\User;
@@ -63,23 +64,40 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     //Routes accesible only if email is verified
     Route::group(['middleware' => ['verified']], function () {
         Route::group(['middleware' => ["ability:manage-practice_offers"]], function () {
+
             Route::post("/practice_offers", [PracticeOffersController::class, "store"]);
 
-            Route::put("/practice_offers/{practiceOffers}", [PracticeOffersController::class, "update"]);
+            Route::put("/practice_offers/{practiceOffer}", [PracticeOffersController::class, "update"]);
 
-            Route::delete("/practice_offers/{practiceOffers}", [PracticeOffersController::class, "destroy"]);
+            Route::delete("/practice_offers/{practiceOffer}", [PracticeOffersController::class, "destroy"]);
         });
 
         Route::group(['middleware' => ["ability:read-practice_offers"]], function () {
 
             Route::get("/practice_offers", [PracticeOffersController::class, "index"]);
 
-            Route::get("/practice_offers/{practiceOffers}", [PracticeOffersController::class, "show"]);
+            Route::get("/practice_offers/{practiceOffer}", [PracticeOffersController::class, "show"]);
 
             Route::get("/practice_offers/departments/{department}", [PracticeOffersController::class, "showByDepartment"]);
 
-            Route::get("/practice_offers/by_company/{company}", [PracticeOffersController::class, "showByCompany"]);
+            Route::get("/practice_offers/companies/{company}", [PracticeOffersController::class, "showByCompany"]);
 
+        });
+        Route::group(['middleware' => ["ability:manage-company_department"]], function () {
+            Route::get("/company_department", [CompanyDepartmentController::class, "index"]);
+
+            Route::post("/company_department/{companyDepartment}", [CompanyDepartmentController::class, "store"]);
+
+            Route::get("/company_department/{companyDepartment}", [CompanyDepartmentController::class, "show"]);
+
+            Route::put("/company_department/{companyDepartment}", [CompanyDepartmentController::class, "update"]);
+
+            Route::delete("/company_department/{companyDepartment}", [CompanyDepartmentController::class, "destroy"]);
+        });
+        Route::group(['middleware' => ["ability:filter-company_department"]], function () {
+            Route::get("/company_department/department/{department}", [CompanyDepartmentController::class, "showByDepartment"]);
+
+            Route::get("/company_department/company/{company}", [CompanyDepartmentController::class, "showByCompany"]);
         });
         Route::post("/users", [UserController::class, "store"])->middleware(
             'ability:create-department-head,create-department-employee,create-company-representative,create-student'
