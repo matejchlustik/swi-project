@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Comment;
 use App\Models\Practice;
+use App\Models\User;
 use Illuminate\Http\Request;
 
 class CommentController extends Controller
@@ -20,65 +21,51 @@ class CommentController extends Controller
             'total' => $comments->total()
         ]);
     }
-    public function getCommentsByPracticeId(int $practiceId)
+    public function getCommentsByPracticeId(Practice $practice)
     {
-        $practice = Practice::find($practiceId);
+        $practices = Practice::find($practice->id);
 
-        return $practice->comments;
+        return response($practices);
     }
 
     public function store(Request $request)
     {
-        $coment = Comment::create($request->all());
-
-        return response()->json($coment,201);
+        $validatedData = $request->validate([
+            'body' => 'required',
+            'practice_id' => 'required|exists:practices,id',
+            'user_id' => 'required|exists:users,id'
+        ]);
+        $comment = Comment::create($validatedData);
+        //return response($validatedData);
+        return response()->json($comment);
 
     }
 
     public function update(Comment $comment, Request $request)
     {
-        $comment = Comment::find($comment->id);
-
-        if ($comment->user_id !== auth()->user()->id && auth()->user()->role->name !== 'Admin') {
-            return response("Forbidden", 403);
-        } else {
+        if (auth()->user()->role->role !== "Admin") {
+            if (auth()->user()->id !== $comment->user_id) {
+                return response("Forbidden", 403);
+            }
+        }
             $comment->fill($request->all());
             $comment->save();
 
             return response()->json($comment);
-        }
     }
-    public function getCommentsByUserId(int $userId)
+    public function getCommentsByUserId(User $user)
     {
-        $comments = Comment::where('user_id', $userId)->get();
+        $comments = Comment::where('user_id', $user->id)->get();
 
-        return $comments;
+        return response($comments);
     }
     public function destroy(Comment $comment)
     {
-        $user = auth()->user();
-
-        // Ak je používateľ admin, môže vymazať akýkoľvek komentár.
-        if ($user->role->name === 'Admin') {
-            return $comment->delete();
+        if (auth()->user()->role->role !== "Admin") {
+        if (auth()->user()->id !== $comment->user_id) {
+                return response("Forbidden", 403);
         }
-
-        // Ak je používateľ študent, môže vymazať iba komentár, ktorý napísal.
-        if ($user->role->name === 'Študent' && $comment->user_id === $user->id) {
-            return $comment->delete();
         }
-
-        // Ak je používateľ poverený pracovník pracoviska, môže vymazať iba komentár, ktorý napísal.
-        if ($user->role->name === 'Poverený pracovník pracoviska' && $comment->user_id === $user->id) {
-            return $comment->delete();
-        }
-
-        // Ak je používateľ vedúci pracoviska, môže vymazať iba komentár, ktorý napísal.
-        if ($user->role->name === 'Vedúci pracoviska' && $comment->user_id === $user->id) {
-            return $comment->delete();
-        }
-
-        // Používateľ nemá povolenie vymazať komentár.
-        return response("Forbidden", 403);
+            return response($comment->delete());
     }
 }

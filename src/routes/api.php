@@ -58,21 +58,22 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post("/users", [UserController::class, "store"])->middleware(
             'ability:create-department-head,create-department-employee,create-company-representative,create-student'
         );
-        Route::group(['middleware' => ['verified', 'ability:manage-comments']], function () {
 
-                Route::post('/comments', [CommentController::class, 'store']);
+        Route::group(['middleware' => ['ability:read-comments']], function () {
 
-                Route::put('/comments/{comment}', [CommentController::class, 'update']);
+            Route::get('/comments/practice/{practice}', [CommentController::class, 'getCommentsByPracticeId']);
 
-                Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
+            Route::put('/comments/{comment}', [CommentController::class, 'update']);
+
+            Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
+
+            Route::post('/comments', [CommentController::class, 'store']);
         });
-        Route::group(['middleware' => ['verified', 'ability:read-comments']], function () {
+        Route::group(['middleware' => ['verified', 'ability:admin-comments']], function () {
 
             Route::get('/comments', [CommentController::class, 'index']);
 
-            Route::get('/comments/practice/{practiceId}', [CommentController::class, 'getCommentsByPracticeId']);
-
-            Route::get('/comments/user/{userId}', [CommentController::class, 'getCommentsByUserId']);
+            Route::get('/comments/user/{user}', [CommentController::class, 'getCommentsByUserId']);
         });
 
         Route::group(['middleware' => ["ability:read-practices"]], function () {

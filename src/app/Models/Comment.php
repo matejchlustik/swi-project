@@ -9,10 +9,8 @@ class Comment extends Model
 {
     protected $fillable = [
         'body',
-        'practice_offer_id',
+        'practice_id',
         'user_id',
-        'created_at',
-        'updated_at',
     ];
 
     public function user()
