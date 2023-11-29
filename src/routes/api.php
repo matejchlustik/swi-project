@@ -61,26 +61,28 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::group(['middleware' => ["ability:read-practices"]], function () {
 
             Route::get('/practice_records/practices/{practice}', [PracticeRecordsController::class, "index"]);
-    
+
             Route::get('/practices', [PracticeController::class, "index"]);
-    
+
             Route::get('/practices/{practice}', [PracticeController::class, "show"]);
         });
         Route::group(['middleware' => ["ability:manage-practices"]], function () {
-    
+
             Route::post('/practice_records', [PracticeRecordsController::class, "store"]);
-        
+
             Route::put('/practice_records/{practice_record}', [PracticeRecordsController::class, "update"]);
-        
+
             Route::delete('/practice_records/{practice_record}', [PracticeRecordsController::class, "destroy"]);
-    
+
             Route::post('/practices', [PracticeController::class, "store"]);
-        
+
             Route::put('/practices/{practice}', [PracticeController::class, "update"]);
-        
+
             Route::delete('/practices/{practice}', [PracticeController::class, "destroy"]);
+
+            Route::post('/practices_contract/{id}', [PracticeController::class, "update_contract"]);
         });
-    
+
     });
 
 });

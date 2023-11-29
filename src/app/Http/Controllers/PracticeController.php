@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Practice;
 use App\Models\PracticeRecord;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 
 class PracticeController extends Controller
@@ -20,6 +21,13 @@ class PracticeController extends Controller
         $newPractice->program_id = $request->input('program_id');
         $newPractice->contract = $request->input('contract');
         $newPractice->user_id = auth()->id();
+
+        if ($request->hasFile('contract')){
+            $file = $request->file('contract');
+            $filename = uniqid().'_'.$file->getClientOriginalName();
+            Storage::putFileAs('contracts',$file,$filename);         //ubuntu cmd: sudo chmod -R 777 storage
+            $newPractice->contract = $filename;
+        }
 
         $newPractice->save();
 
@@ -60,7 +68,7 @@ class PracticeController extends Controller
                 return response("Forbidden", 403);
             }
         }
-        
+
         return response()->json($practice->load(["companyEmployee.company","companyEmployee.user"]));
     }
 
@@ -69,7 +77,7 @@ class PracticeController extends Controller
         if(auth()->user()->role->role === "Študent") {
             if($practice->user_id !== auth()->id()) {
                 return response ("Forbidden", 403);
-            } 
+            }
         }
 
         $practice->fill($request->all());
@@ -83,7 +91,7 @@ class PracticeController extends Controller
         if(auth()->user()->role->role === "Študent") {
             if($practice->user_id !== auth()->id()) {
                 return response ("Forbidden", 403);
-            } 
+            }
         }
 
         $practice->delete();
@@ -92,6 +100,26 @@ class PracticeController extends Controller
             'message' => 'Practice deleted successfully.',
         ]);
     }
+
+    public function update_contract(int $id, Request $request)
+    {
+        if ($request->hasFile('contract')){
+
+            $practice = Practice::findOrFail($id);
+            $contract_name = $practice->contract;
+            Storage::delete('contracts/'.$contract_name);
+
+            $file = $request->file('contract');
+            $filename = uniqid().'_'.$file->getClientOriginalName();
+            Storage::putFileAs('contracts',$file,$filename);         //ubuntu cmd: sudo chmod -R 777 storage
+            $practice->contract = $filename;
+
+            $practice->save();
+        }
+    }
+
+
+
 
 
 }
