@@ -47,4 +47,8 @@ class Practice extends Model
     {
         return $this->belongsTo(Program::class);
     }
+    public function feedback() :HasMany
+    {
+        return $this->hasMany(feedback::class);
+    }
 }

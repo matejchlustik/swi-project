@@ -163,6 +163,8 @@ class UserController extends Controller {
                         "create-student",
                         "manage-practices",
                         "read-practices",
+                        "manage-feedback",
+                        "admin-feedback"
                     ]
                 )->plainTextToken;
                 break;
@@ -175,6 +177,7 @@ class UserController extends Controller {
                         "create-student",
                         "manage-practices",
                         "read-practices",
+                        "manage-feedback"
                     ]
                 )->plainTextToken;
                 break;
@@ -186,6 +189,7 @@ class UserController extends Controller {
                         "create-student",
                         "manage-practices",
                         "read-practices",
+                        "manage-feedback"
                     ]
                 )->plainTextToken;
                 break;
@@ -193,6 +197,7 @@ class UserController extends Controller {
                 $token = $user->createToken(
                     "companyRepresentativeToken",[
                         "read-practices",
+                        "manage-feedback"
                     ]
                 )->plainTextToken;
                 break;
@@ -200,7 +205,8 @@ class UserController extends Controller {
                 $token = $user->createToken(
                     "studentToken",[
                         "manage-practices",
-                        "read-practices"
+                        "read-practices",
+                        "manage-feedback"
                     ]
                 )->plainTextToken;
                 break;

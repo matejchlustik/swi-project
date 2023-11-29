@@ -3,9 +3,10 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CompanyController;
-use App\Http\Controllers\EmailVerificationController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\PracticeController;
 use App\Http\Controllers\PracticeRecordsController;
+use App\Http\Controllers\EmailVerificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -80,7 +81,20 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         
             Route::delete('/practices/{practice}', [PracticeController::class, "destroy"]);
         });
+        Route::group(['middleware' => ["ability:manage-feedback"]], function () {
+            Route::get("/feedback/{feedback}", [FeedbackController::class, "store"]);
+            Route::delete('/feedback/{feedback}', [FeedbackController::class, "destroy"]);  
+            Route::put('/feedback/{feedback}', [FeedbackController::class, 'update']);
+            Route::get('/feedback/practice/{practice}', [FeedbackController::class, 'getFeedbacksByPracticeId']);
+        });
+        Route::group(['middleware' => ['verified', 'ability:admin-feedback']], function () {
+
+            Route::get('/feedback', [CommentController::class, 'index']);
+
+            Route::get('/feedback/user/{user}', [CommentController::class, 'getfeedbacksByUserId']);
+        });
     
     });
 
 });
+

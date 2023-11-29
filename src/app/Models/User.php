@@ -78,4 +78,8 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(CompanyEmployee::class);
     }
+    public function feedback() :HasMany
+    {
+        return $this->hasMany(feedback::class);
+    }
 }
