@@ -13,13 +13,20 @@ class PracticeController extends Controller
 
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            'from' => 'required|date|after_or_equal:today',
+            'to' => 'required|date|after:from',
+            'company_employee_id' => 'required|integer|not_in:0',
+            'department_employee_id' => 'nullable|integer|not_in:0',
+            'program_id' => 'required|integer|not_in:0',
+            'contract' => 'nullable|image'
+        ]);
         $newPractice = new Practice();
-        $newPractice->from = $request->input('from');
-        $newPractice->to = $request->input('to');
-        $newPractice->company_employee_id = $request->input('company_employee_id');
-        $newPractice->department_employee_id = $request->input('department_employee_id');
-        $newPractice->program_id = $request->input('program_id');
-        $newPractice->contract = $request->input('contract');
+        $newPractice->from = $validated['from'];
+        $newPractice->to = $validated['to'];
+        $newPractice->company_employee_id = $validated['company_employee_id'];
+        $newPractice->department_employee_id = $validated['department_employee_id'];
+        $newPractice->program_id = $validated['program_id'];
         $newPractice->user_id = auth()->id();
 
         if ($request->hasFile('contract')){
@@ -80,6 +87,14 @@ class PracticeController extends Controller
             }
         }
 
+         $request->validate([
+            'from' => 'required|date|after_or_equal:today',
+            'to' => 'required|date|after:from',
+            'company_employee_id' => 'required|integer|not_in:0',
+            'department_employee_id' => 'nullable|integer|not_in:0',
+            'program_id' => 'required|integer|not_in:0',
+        ]);
+
         $practice->fill($request->all());
         $practice->save();
 
@@ -103,12 +118,17 @@ class PracticeController extends Controller
 
     public function update_contract(int $id, Request $request)
     {
-        if ($request->hasFile('contract')){
+        $practice = Practice::findOrFail($id);
 
-            $practice = Practice::findOrFail($id);
+        if(auth()->user()->role->role === "Študent") {
+            if($practice->user_id !== auth()->id()) {
+                return response ("Forbidden", 403);
+            }
+        }
+        if ($request->hasFile('contract')){
+            $request->validate(['contract' => 'image']);
             $contract_name = $practice->contract;
             Storage::delete('contracts/'.$contract_name);
-
             $file = $request->file('contract');
             $filename = uniqid().'_'.$file->getClientOriginalName();
             Storage::putFileAs('contracts',$file,$filename);         //ubuntu cmd: sudo chmod -R 777 storage

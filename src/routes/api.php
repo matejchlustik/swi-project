@@ -80,8 +80,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
             Route::delete('/practices/{practice}', [PracticeController::class, "destroy"]);
 
-            Route::post('/practices_contract/{id}', [PracticeController::class, "update_contract"]);
         });
+
+        Route::post('/practices_contract/{id}', [PracticeController::class, "update_contract"])->middleware('ability:create-contract');
 
     });
 
