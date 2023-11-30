@@ -55,13 +55,11 @@ class PracticeOffersController extends Controller
 
     public function update(PracticeOffer $practiceOffer,Request $request)
     {
-// Ak je používateľ zástupcom firmy, ktorá ponúka prax, môže ju upraviť alebo vymazať.
-     /*   if (auth()->user()->role->role === "Zástupca firmy") {
-            // Ak používateľ nie je zamestnancom spoločnosti, ktorá ponúka prax, vráti chybu.
-            if (auth()->user()->companyEmployees->company->id !== $practiceOffer->companyDepartment->company_id) {
+        if (auth()->user()->role->role === "Zástupca firmy") {
+            if (auth()->user()->companyEmployee->company->id !== $practiceOffer->companyDepartment->company_id) {
                 return response("Forbidden", 403);
             }
-        }*/
+        }
 
         $practiceOffer->fill($request->all());
         $practiceOffer->save();
@@ -72,15 +70,13 @@ class PracticeOffersController extends Controller
     public function destroy( PracticeOffer $practiceOffer,Request $request)
     {
 
-// Ak je používateľ zástupcom firmy, ktorá ponúka prax, môže ju upraviť alebo vymazať.
         if (auth()->user()->role->role === "Zástupca firmy") {
-            // Ak používateľ nie je zamestnancom spoločnosti, ktorá ponúka prax, vráti chybu.
             if (auth()->user()->companyEmployee->company->id !== $practiceOffer->companyDepartment->company_id) {
                 return response("Forbidden", 403);
             }
         }
-            $practiceOffer->delete();
-            return response()->json(['message' => 'Úspěšně smazáno']);
+        $practiceOffer->delete();
+        return response()->json(['message' => 'Úspěšně smazáno']);
     }
 
 }

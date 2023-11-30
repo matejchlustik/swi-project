@@ -59,20 +59,17 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::post('/change-password', [UserController::class, "changePassword"]);
 
+        //Routes accesible only if email is verified
+        Route::group(['middleware' => ['verified']], function () {
 
+            Route::group(['middleware' => ["ability:manage-practice-offers"]], function () {
 
-    //Routes accesible only if email is verified
-    Route::group(['middleware' => ['verified']], function () {
-        Route::group(['middleware' => ["ability:manage-practice_offers"]], function () {
+                Route::post("/practice_offers", [PracticeOffersController::class, "store"]);
 
-            Route::post("/practice_offers", [PracticeOffersController::class, "store"]);
+                Route::put("/practice_offers/{practiceOffer}", [PracticeOffersController::class, "update"]);
 
-            Route::put("/practice_offers/{practiceOffer}", [PracticeOffersController::class, "update"]);
-
-            Route::delete("/practice_offers/{practiceOffer}", [PracticeOffersController::class, "destroy"]);
-        });
-
-        Route::group(['middleware' => ["ability:read-practice_offers"]], function () {
+                Route::delete("/practice_offers/{practiceOffer}", [PracticeOffersController::class, "destroy"]);
+            });
 
             Route::get("/practice_offers", [PracticeOffersController::class, "index"]);
 
@@ -82,26 +79,26 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
             Route::get("/practice_offers/companies/{company}", [PracticeOffersController::class, "showByCompany"]);
 
-        });
-        Route::group(['middleware' => ["ability:manage-company_department"]], function () {
-            Route::get("/company_department", [CompanyDepartmentController::class, "index"]);
+            Route::group(['middleware' => ["ability:manage-company_department"]], function () {
+                
+                Route::get("/company_department", [CompanyDepartmentController::class, "index"]);
 
-            Route::post("/company_department/{companyDepartment}", [CompanyDepartmentController::class, "store"]);
+                Route::post("/company_department", [CompanyDepartmentController::class, "store"]);
 
-            Route::get("/company_department/{companyDepartment}", [CompanyDepartmentController::class, "show"]);
+                Route::get("/company_department/{companyDepartment}", [CompanyDepartmentController::class, "show"]);
 
-            Route::put("/company_department/{companyDepartment}", [CompanyDepartmentController::class, "update"]);
+                Route::put("/company_department/{companyDepartment}", [CompanyDepartmentController::class, "update"]);
 
-            Route::delete("/company_department/{companyDepartment}", [CompanyDepartmentController::class, "destroy"]);
-        });
-        Route::group(['middleware' => ["ability:filter-company_department"]], function () {
-            Route::get("/company_department/department/{department}", [CompanyDepartmentController::class, "showByDepartment"]);
+                Route::delete("/company_department/{companyDepartment}", [CompanyDepartmentController::class, "destroy"]);
 
-            Route::get("/company_department/company/{company}", [CompanyDepartmentController::class, "showByCompany"]);
-        });
-        Route::post("/users", [UserController::class, "store"])->middleware(
-            'ability:create-department-head,create-department-employee,create-company-representative,create-student'
-        );
+                Route::get("/company_department/departments/{department}", [CompanyDepartmentController::class, "showByDepartment"]);
+
+                Route::get("/company_department/companies/{company}", [CompanyDepartmentController::class, "showByCompany"]);
+            });
+            
+            Route::post("/users", [UserController::class, "store"])->middleware(
+                'ability:create-department-head,create-department-employee,create-company-representative,create-student'
+            );
 
     });
 

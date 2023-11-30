@@ -23,7 +23,7 @@ class Company extends Model
     public function departments()
     {
         //return $this->belongsToMany(Department::class)->using(CompanyDepartment::class);
-        return $this->belongsToMany('App\Models\Department', 'company_department', 'companies_id', 'id');
+        return $this->belongsToMany(Department::class)->using(CompanyDepartment::class);
     }
     public function companyEmployee()
     {

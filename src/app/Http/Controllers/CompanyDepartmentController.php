@@ -15,18 +15,26 @@ class CompanyDepartmentController extends Controller
 
         return response()->json($departments);
     }
-    public function update(Request $request, CompanyDepartment $department)
+    
+    public function update(Request $request, CompanyDepartment $companyDepartment)
     {
-        $department->fill($request->all());
-        $department->save();
+        $companyDepartment->fill($request->all());
+        $companyDepartment->save();
 
-        return response()->json($department);
+        return response()->json($companyDepartment);
+    }
+
+    public function store(Request $request) {
+
+        $companyDepartment = Companydepartment::create($request->all());
+
+        return response()->json($companyDepartment,201);
     }
 
     public function show(CompanyDepartment $companyDepartment)
     {
 
-        return response()->json($companyDepartment);
+        return response()->json($companyDepartment->load(["department","company"]));
     }
 
     public function destroy(CompanyDepartment $companyDepartment)
@@ -35,12 +43,14 @@ class CompanyDepartmentController extends Controller
 
         return response()->json(['success' => true]);
     }
+
     public function showByDepartment(Department $department)
     {
         $departments = CompanyDepartment::where("department_id", $department->id)->paginate(10);
 
         return response()->json($departments);
     }
+
     public function showByCompany(Company $company)
     {
         $departments = CompanyDepartment::where('company_id', $company->id)->paginate(10);

@@ -161,9 +161,7 @@ class UserController extends Controller {
                         "create-department-employee",
                         "create-company-representative",
                         "create-student",
-                        "read-practice_offers",
-                        "manage-practice_offers",
-                        "filter-company_department",
+                        "manage-practice-offers",
                         "manage-company_department"
                     ]
                 )->plainTextToken;
@@ -175,9 +173,7 @@ class UserController extends Controller {
                         "create-department-employee",
                         "create-company-representative",
                         "create-student",
-                        "read-practice_offers",
-                        "manage-practice_offers",
-                        "filter-company_department",
+                        "manage-practice-offers",
                         "manage-company_department"
                     ]
                 )->plainTextToken;
@@ -188,25 +184,23 @@ class UserController extends Controller {
                     [
                         "create-company-representative",
                         "create-student",
-                        "read-practice_offers",
-                        "manage-practice_offers",
-                        "filter-company_department",
+                        "manage-practice-offers",
                         "manage-company_department"
                     ]
                 )->plainTextToken;
                 break;
             case 4:
                 $token = $user->createToken(
-                    "companyRepresentativeToken",[
-                        "read-practice_offers",
-                        "manage-practice_offers"
+                    "companyRepresentativeToken",
+                    [
+                        "manage-practice-offers"
                     ]
                 )->plainTextToken;
                 break;
             case 5:
                 $token = $user->createToken(
                     "studentToken",[
-                        "read-practice_offers"
+
                     ]
                 )->plainTextToken;
                 break;

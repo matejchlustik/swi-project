@@ -28,7 +28,7 @@ class Department extends Model
     }
     public function companies()
     {
-        return $this->belongsToMany('App\Models\Company', 'company_department', 'departments_id', 'id');
+        return $this->belongsToMany(Company::class)->using(CompanyDepartment::class);
         //return $this->belongsToMany(Company::class)->using(CompanyDepartment::class);
     }
     public function departmentEmployee()
