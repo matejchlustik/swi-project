@@ -6,6 +6,8 @@ use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmailVerificationController;
 use App\Http\Controllers\PracticeController;
 use App\Http\Controllers\PracticeRecordsController;
+use App\Http\Controllers\CompanyDepartmentController;
+use App\Http\Controllers\PracticeOffersController;
 
 /*
 |--------------------------------------------------------------------------
@@ -38,6 +40,7 @@ Route::get('/reset-password/{token}', [UserController::class, "resetToken"])->na
 
 Route::post('/reset-password', [UserController::class, "passwordReset"])->name('password.update');
 
+
 //Routes accesible only with token
 Route::group(['middleware' => ['auth:sanctum']], function () {
 
@@ -51,35 +54,69 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::post('/change-password', [UserController::class, "changePassword"]);
 
-    //Routes accesible only if email is verified
-    Route::group(['middleware' => ['verified']], function () {
+        //Routes accesible only if email is verified
+        Route::group(['middleware' => ['verified']], function () {
 
-        Route::post("/users", [UserController::class, "store"])->middleware(
-            'ability:create-department-head,create-department-employee,create-company-representative,create-student'
-        );
+            Route::group(['middleware' => ["ability:manage-practice-offers"]], function () {
 
-        Route::group(['middleware' => ["ability:read-practices"]], function () {
+                Route::post("/practice_offers", [PracticeOffersController::class, "store"]);
 
-            Route::get('/practice_records/practices/{practice}', [PracticeRecordsController::class, "index"]);
-    
-            Route::get('/practices', [PracticeController::class, "index"]);
-    
-            Route::get('/practices/{practice}', [PracticeController::class, "show"]);
-        });
-        Route::group(['middleware' => ["ability:manage-practices"]], function () {
-    
-            Route::post('/practice_records', [PracticeRecordsController::class, "store"]);
+                Route::put("/practice_offers/{practiceOffer}", [PracticeOffersController::class, "update"]);
+
+                Route::delete("/practice_offers/{practiceOffer}", [PracticeOffersController::class, "destroy"]);
+            });
+
+            Route::get("/practice_offers", [PracticeOffersController::class, "index"]);
+
+            Route::get("/practice_offers/{practiceOffer}", [PracticeOffersController::class, "show"]);
+
+            Route::get("/practice_offers/departments/{department}", [PracticeOffersController::class, "showByDepartment"]);
+
+            Route::get("/practice_offers/companies/{company}", [PracticeOffersController::class, "showByCompany"]);
+
+            Route::group(['middleware' => ["ability:manage-company-department"]], function () {
+                
+                Route::get("/company_department", [CompanyDepartmentController::class, "index"]);
+
+                Route::post("/company_department", [CompanyDepartmentController::class, "store"]);
+
+                Route::get("/company_department/{companyDepartment}", [CompanyDepartmentController::class, "show"]);
+
+                Route::put("/company_department/{companyDepartment}", [CompanyDepartmentController::class, "update"]);
+
+                Route::delete("/company_department/{companyDepartment}", [CompanyDepartmentController::class, "destroy"]);
+
+                Route::get("/company_department/departments/{department}", [CompanyDepartmentController::class, "showByDepartment"]);
+
+                Route::get("/company_department/companies/{company}", [CompanyDepartmentController::class, "showByCompany"]);
+            });
+            
+            Route::post("/users", [UserController::class, "store"])->middleware(
+                'ability:create-department-head,create-department-employee,create-company-representative,create-student'
+            );
+
+            Route::group(['middleware' => ["ability:read-practices"]], function () {
+
+                Route::get('/practice_records/practices/{practice}', [PracticeRecordsController::class, "index"]);
         
-            Route::put('/practice_records/{practice_record}', [PracticeRecordsController::class, "update"]);
+                Route::get('/practices', [PracticeController::class, "index"]);
         
-            Route::delete('/practice_records/{practice_record}', [PracticeRecordsController::class, "destroy"]);
-    
-            Route::post('/practices', [PracticeController::class, "store"]);
+                Route::get('/practices/{practice}', [PracticeController::class, "show"]);
+            });
+            Route::group(['middleware' => ["ability:manage-practices"]], function () {
         
-            Route::put('/practices/{practice}', [PracticeController::class, "update"]);
+                Route::post('/practice_records', [PracticeRecordsController::class, "store"]);
+            
+                Route::put('/practice_records/{practice_record}', [PracticeRecordsController::class, "update"]);
+            
+                Route::delete('/practice_records/{practice_record}', [PracticeRecordsController::class, "destroy"]);
         
-            Route::delete('/practices/{practice}', [PracticeController::class, "destroy"]);
-        });
+                Route::post('/practices', [PracticeController::class, "store"]);
+            
+                Route::put('/practices/{practice}', [PracticeController::class, "update"]);
+            
+                Route::delete('/practices/{practice}', [PracticeController::class, "destroy"]);
+            });
     
     });
 

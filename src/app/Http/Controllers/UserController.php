@@ -163,6 +163,8 @@ class UserController extends Controller {
                         "create-student",
                         "manage-practices",
                         "read-practices",
+                        "manage-practice-offers",
+                        "manage-company-department"
                     ]
                 )->plainTextToken;
                 break;
@@ -175,6 +177,8 @@ class UserController extends Controller {
                         "create-student",
                         "manage-practices",
                         "read-practices",
+                        "manage-practice-offers",
+                        "manage-company-department"
                     ]
                 )->plainTextToken;
                 break;
@@ -186,13 +190,17 @@ class UserController extends Controller {
                         "create-student",
                         "manage-practices",
                         "read-practices",
+                        "manage-practice-offers",
+                        "manage-company-department"
                     ]
                 )->plainTextToken;
                 break;
             case 4:
                 $token = $user->createToken(
-                    "companyRepresentativeToken",[
+                    "companyRepresentativeToken",
+                    [
                         "read-practices",
+                        "manage-practice-offers"
                     ]
                 )->plainTextToken;
                 break;
@@ -226,11 +234,11 @@ class UserController extends Controller {
 
     public function forgotPassword(Request $request) {
         $request->validate(['email' => 'required|email']);
- 
+
         $status = Password::sendResetLink(
             $request->only('email')
         );
-     
+
         return $status === Password::RESET_LINK_SENT
                     ? response(['status' => __($status)])
                     : response(['email' => __($status)]);
@@ -246,20 +254,20 @@ class UserController extends Controller {
             'email' => 'required|email',
             'password' => 'required|confirmed',
         ]);
-     
+
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
             function (User $user, string $password) {
                 $user->forceFill([
                     'password' => Hash::make($password)
                 ]);
-     
+
                 $user->save();
-     
+
                 event(new PasswordReset($user));
             }
         );
-     
+
         return $status === Password::PASSWORD_RESET
                     ? response(['status' => __($status)])
                     : response(['email' => __($status)]);
