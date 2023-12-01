@@ -76,7 +76,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
             Route::post('/practices', [PracticeController::class, "store"]);
 
-            Route::put('/practices/{practice}', [PracticeController::class, "update"]);
+            Route::post('/practices/{practice}', [PracticeController::class, "update"]);
 
             Route::delete('/practices/{practice}', [PracticeController::class, "destroy"]);
 

@@ -6,6 +6,7 @@ use App\Models\Practice;
 use App\Models\PracticeRecord;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rules\File;
 
 
 class PracticeController extends Controller
@@ -14,18 +15,18 @@ class PracticeController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'from' => 'required|date|after_or_equal:today',
+            'from' => 'required|date',
             'to' => 'required|date|after:from',
             'company_employee_id' => 'required|integer|not_in:0',
-            'department_employee_id' => 'nullable|integer|not_in:0',
             'program_id' => 'required|integer|not_in:0',
-            'contract' => 'nullable|image'
+            //'contract' => ["nullable",File::types(['docx', 'pdf'])]
+            'contract' => "image"
         ]);
         $newPractice = new Practice();
         $newPractice->from = $validated['from'];
         $newPractice->to = $validated['to'];
         $newPractice->company_employee_id = $validated['company_employee_id'];
-        $newPractice->department_employee_id = $validated['department_employee_id'];
+        $newPractice->department_employee_id = $request->input('department_employee_id');
         $newPractice->program_id = $validated['program_id'];
         $newPractice->user_id = auth()->id();
 
@@ -88,14 +89,24 @@ class PracticeController extends Controller
         }
 
          $request->validate([
-            'from' => 'required|date|after_or_equal:today',
-            'to' => 'required|date|after:from',
-            'company_employee_id' => 'required|integer|not_in:0',
-            'department_employee_id' => 'nullable|integer|not_in:0',
-            'program_id' => 'required|integer|not_in:0',
+             'from' => 'date',
+             'to' => 'date|after:from',
+             'company_employee_id' => 'integer|not_in:0',
+             'program_id' => 'integer|not_in:0',
+             'contract' => 'image'
         ]);
 
-        $practice->fill($request->all());
+        $practice->fill($request->only(['from','to','company_employee_id','program_id']));
+
+        if ($request->hasFile('contract')){
+            $contract_name = $practice->contract;
+            Storage::delete('contracts/'.$contract_name);
+            $file = $request->file('contract');
+            $filename = uniqid().'_'.$file->getClientOriginalName();
+            Storage::putFileAs('contracts',$file,$filename);         //ubuntu cmd: sudo chmod -R 777 storage
+            $practice->contract = $filename;
+        }
+
         $practice->save();
 
         return response()->json($practice);
@@ -116,7 +127,7 @@ class PracticeController extends Controller
         ]);
     }
 
-    public function update_contract(int $id, Request $request)
+    public function download_contract(int $id, Request $request)
     {
         $practice = Practice::findOrFail($id);
 
