@@ -164,7 +164,10 @@ class UserController extends Controller {
                         "manage-practices",
                         "read-practices",
                         "manage-practice-offers",
-                        "manage-company-department"
+                        "manage-company-department",
+                        "read-company",
+                        "manage-company",
+                        "edit-company",
                     ]
                 )->plainTextToken;
                 break;
@@ -178,7 +181,10 @@ class UserController extends Controller {
                         "manage-practices",
                         "read-practices",
                         "manage-practice-offers",
-                        "manage-company-department"
+                        "manage-company-department",
+                        "read-company",
+                        "manage-company",
+                        "edit-company",
                     ]
                 )->plainTextToken;
                 break;
@@ -191,7 +197,10 @@ class UserController extends Controller {
                         "manage-practices",
                         "read-practices",
                         "manage-practice-offers",
-                        "manage-company-department"
+                        "manage-company-department",
+                        "read-company",
+                        "manage-company",
+                        "edit-company",
                     ]
                 )->plainTextToken;
                 break;
@@ -200,7 +209,9 @@ class UserController extends Controller {
                     "companyRepresentativeToken",
                     [
                         "read-practices",
-                        "manage-practice-offers"
+                        "manage-practice-offers",
+                        "read-company",
+                        "edit-company",
                     ]
                 )->plainTextToken;
                 break;
@@ -208,7 +219,8 @@ class UserController extends Controller {
                 $token = $user->createToken(
                     "studentToken",[
                         "manage-practices",
-                        "read-practices"
+                        "read-practices",
+                        "read-company",
                     ]
                 )->plainTextToken;
                 break;

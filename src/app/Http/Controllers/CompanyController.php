@@ -22,6 +22,12 @@ class CompanyController extends Controller
 
     public function update(Company $company, Request $request)
     {
+        if (auth()->user()->role->role === "Zástupca firmy") {
+            if (auth()->user()->companyEmployee->company->id !== $company->id) {
+                return response("Forbidden", 403);
+            }
+        }
+
         $company->fill($request->all());
         $company->save();
 
