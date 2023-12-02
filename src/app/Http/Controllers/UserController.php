@@ -163,7 +163,7 @@ class UserController extends Controller {
                         "create-student",
                         "manage-practices",
                         "read-practices",
-                        "read-comments",
+                        "manage-comments",
                         "admin-comments",
                     ]
                 )->plainTextToken;
@@ -177,7 +177,7 @@ class UserController extends Controller {
                         "create-student",
                         "manage-practices",
                         "read-practices",
-                        "read-comments",
+                        "manage-comments",
                     ]
                 )->plainTextToken;
                 break;
@@ -189,7 +189,7 @@ class UserController extends Controller {
                         "create-student",
                         "manage-practices",
                         "read-practices",
-                        "read-comments",
+                        "manage-comments",
 
                     ]
                 )->plainTextToken;
@@ -206,7 +206,7 @@ class UserController extends Controller {
                     "studentToken",[
                         "manage-practices",
                         "read-practices",
-                        "read-comments",
+                        "manage-comments",
                     ]
                 )->plainTextToken;
                 break;

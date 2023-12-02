@@ -59,7 +59,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             'ability:create-department-head,create-department-employee,create-company-representative,create-student'
         );
 
-        Route::group(['middleware' => ['ability:read-comments']], function () {
+        Route::group(['middleware' => ['ability:manage-comments']], function () {
 
             Route::get('/comments/practice/{practice}', [CommentController::class, 'getCommentsByPracticeId']);
 

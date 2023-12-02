@@ -30,15 +30,13 @@ class CommentController extends Controller
 
     public function store(Request $request)
     {
-        $validatedData = $request->validate([
-            'body' => 'required',
-            'practice_id' => 'required|exists:practices,id',
-            'user_id' => 'required|exists:users,id'
-        ]);
-        $comment = Comment::create($validatedData);
-        //return response($validatedData);
-        return response()->json($comment);
-
+            $validatedData = $request->validate([
+                'body' => 'required',
+                'practice_id' => 'required|exists:practices,id',
+                'user_id' => auth()->user()->id
+            ]);
+            $comment = Comment::create($validatedData);
+            return response()->json($comment);
     }
 
     public function update(Comment $comment, Request $request)
@@ -48,7 +46,10 @@ class CommentController extends Controller
                 return response("Forbidden", 403);
             }
         }
-            $comment->fill($request->all());
+        $validatedData = $request->validate([
+            'body' => 'required',
+        ]);
+            $comment->fill($validatedData);
             $comment->save();
 
             return response()->json($comment);
@@ -66,6 +67,7 @@ class CommentController extends Controller
                 return response("Forbidden", 403);
         }
         }
-            return response($comment->delete());
+        $comment->delete();
+        return response()->json(['message' => 'Company deleted successfully.',]);
     }
 }
