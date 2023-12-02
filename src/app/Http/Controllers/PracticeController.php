@@ -19,8 +19,7 @@ class PracticeController extends Controller
             'to' => 'required|date|after:from',
             'company_employee_id' => 'required|integer|not_in:0',
             'program_id' => 'required|integer|not_in:0',
-            //'contract' => ["nullable",File::types(['docx', 'pdf'])]
-            'contract' => "image"
+            'contract' => ["nullable",File::types(['docx', 'pdf'])]
         ]);
         $newPractice = new Practice();
         $newPractice->from = $validated['from'];
@@ -93,14 +92,13 @@ class PracticeController extends Controller
              'to' => 'date|after:from',
              'company_employee_id' => 'integer|not_in:0',
              'program_id' => 'integer|not_in:0',
-             'contract' => 'image'
-        ]);
+             'contract' => ["nullable",File::types(['docx', 'pdf'])]
+         ]);
 
         $practice->fill($request->only(['from','to','company_employee_id','program_id']));
 
         if ($request->hasFile('contract')){
-            $contract_name = $practice->contract;
-            Storage::delete('contracts/'.$contract_name);
+            Storage::delete('contracts/'.$practice->contract);
             $file = $request->file('contract');
             $filename = uniqid().'_'.$file->getClientOriginalName();
             Storage::putFileAs('contracts',$file,$filename);         //ubuntu cmd: sudo chmod -R 777 storage
@@ -127,25 +125,18 @@ class PracticeController extends Controller
         ]);
     }
 
-    public function download_contract(int $id, Request $request)
+    public function download_contract(Practice $practice)
     {
-        $practice = Practice::findOrFail($id);
-
         if(auth()->user()->role->role === "Študent") {
-            if($practice->user_id !== auth()->id()) {
-                return response ("Forbidden", 403);
-            }
-        }
-        if ($request->hasFile('contract')){
-            $request->validate(['contract' => 'image']);
-            $contract_name = $practice->contract;
-            Storage::delete('contracts/'.$contract_name);
-            $file = $request->file('contract');
-            $filename = uniqid().'_'.$file->getClientOriginalName();
-            Storage::putFileAs('contracts',$file,$filename);         //ubuntu cmd: sudo chmod -R 777 storage
-            $practice->contract = $filename;
-
-            $practice->save();
+            if($practice->user_id === auth()->id()) {
+                if (!empty($practice->contract)) return Storage::download('contracts/'.$practice->contract);
+                else return response()->json([
+                    'message' => 'Practice does not have contract.']);
+            } else return response ("Forbidden", 403);
+        }else {
+            if (!empty($practice->contract)) return Storage::download('contracts/'.$practice->contract);
+            else return response()->json([
+                'message' => 'Practice does not have contract.']);
         }
     }
 

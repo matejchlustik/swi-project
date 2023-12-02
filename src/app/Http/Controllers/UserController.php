@@ -201,7 +201,6 @@ class UserController extends Controller {
                     "studentToken",[
                         "manage-practices",
                         "read-practices",
-                        "create-contract"
                     ]
                 )->plainTextToken;
                 break;
