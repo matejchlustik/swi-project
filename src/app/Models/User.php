@@ -30,7 +30,8 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_name',
         'email',
         'password',
-        'role_id'
+        'role_id',
+        'deactivate'
     ];
 
     /**
@@ -78,7 +79,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(CompanyEmployee::class);
     }
-    
+
     public function departmentEmployee() :HasOne
     {
         return $this->hasOne(DepartmentEmployee::class);

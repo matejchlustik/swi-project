@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Mail\Test;
+use App\Models\Department;
+use App\Models\Practice;
+use App\Models\PracticeOffer;
 use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -15,9 +18,23 @@ use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Auth\Events\PasswordReset;
 
-class UserController extends Controller {
+class UserController extends Controller
+{
+    public function index()
+    {
+        $companies = User::paginate(20);
 
-    public function register(Request $request) {
+        return response([
+            'items' => $companies->items(),
+            'prev_page_url' => $companies->previousPageUrl(),
+            'next_page_url' => $companies->nextPageUrl(),
+            'last_page' => $companies->lastPage(),
+            'total' => $companies->total()
+        ]);
+    }
+
+    public function register(Request $request)
+    {
         $fields = $request->validate([
             'email' => 'required|string|unique:users,email',
             'password' => 'required|string|confirmed',
@@ -30,7 +47,8 @@ class UserController extends Controller {
             'first_name' => $fields['first_name'],
             'email' => $fields['email'],
             'password' => Hash::make($fields['password']),
-            'role_id' => Role::firstWhere("role", "Študent")->id
+            'role_id' => Role::firstWhere("role", "Študent")->id,
+            'deactivate' => 0
         ]);
 
         event(new Registered($user));
@@ -51,7 +69,8 @@ class UserController extends Controller {
         );
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
 
         $fields = $request->validate([
             'email' => 'required|string|unique:users,email',
@@ -59,7 +78,6 @@ class UserController extends Controller {
             'first_name' => 'required|string',
             'last_name' => 'required|string',
         ]);
-
         $fields['department_id'] = $request->department_id;
         $fields['company_id'] = $request->company_id;
         $fields['phone'] = $request->phone;
@@ -68,46 +86,52 @@ class UserController extends Controller {
             return response('can\'t send company_id and department_id together', 400);
         }
 
-        function createUser($fields) {
+        function createUser($fields)
+        {
             return User::create([
                 'last_name' => $fields['last_name'],
                 'first_name' => $fields['first_name'],
                 'email' => $fields['email'],
                 'password' => Hash::make('123'),
                 'role_id' => $fields['role_id'],
+                'deactivate' => 0
             ]);
         }
 
         switch ($fields['role_id']) {
             case 2:
-                if ($fields['department_id']) {
-                    if (auth()->user()->tokenCan('create-department-head')) {
+                if ($fields['phone'] == null) {
+                    if ($fields['department_id'] !== null) {
+                        if (auth()->user()->tokenCan('create-department-employee')) {
 
-                        $newUser = createUser($fields);
+                            $newUser = createUser($fields);
 
-                        DepartmentEmployee::create([
-                            'user_id' => $newUser->id,
-                            'department_id' => $fields['department_id']
-                        ]);
-                        $newUser->markEmailAsVerified();
-                        return response('User created', 201);
-                    } else return response('Forbidden', 403);
-                } else return response("Missing department_id", 400);
+                            DepartmentEmployee::create([
+                                'user_id' => $newUser->id,
+                                'department_id' => $fields['department_id']
+                            ]);
+                            $newUser->markEmailAsVerified();
+                            return response('User created', 201);
+                        } else return response('Forbidden', 403);
+                    } else return response("Missing department_id", 400);
+                } else return response("Do not send field phone when creating Vedúci pracoviska or Poverený pracovník pracoviska", 400);
                 break;
             case 3:
-                if ($fields['department_id'] !== null) {
-                    if (auth()->user()->tokenCan('create-department-employee')) {
+                if ($fields['phone'] == null) {
+                    if ($fields['department_id'] !== null) {
+                        if (auth()->user()->tokenCan('create-department-employee')) {
 
-                        $newUser = createUser($fields);
+                            $newUser = createUser($fields);
 
-                        DepartmentEmployee::create([
-                            'user_id' => $newUser->id,
-                            'department_id' => $fields['department_id']
-                        ]);
-                        $newUser->markEmailAsVerified();
-                        return response('User created', 201);
-                    } else return response('Forbidden', 403);
-                } else return response("Missing department_id", 400);
+                            DepartmentEmployee::create([
+                                'user_id' => $newUser->id,
+                                'department_id' => $fields['department_id']
+                            ]);
+                            $newUser->markEmailAsVerified();
+                            return response('User created', 201);
+                        } else return response('Forbidden', 403);
+                    } else return response("Missing department_id", 400);
+                } else return response("Do not send field phone when creating department-head or department-employee", 400);
                 break;
             case 4:
                 if ($fields['company_id'] !== null && $fields['phone'] !== null) {
@@ -138,7 +162,8 @@ class UserController extends Controller {
         }
     }
 
-    public function login(Request $request) {
+    public function login(Request $request)
+    {
 
         $fields = $request->validate([
             'email' => 'required|string',
@@ -217,7 +242,7 @@ class UserController extends Controller {
                 break;
             case 5:
                 $token = $user->createToken(
-                    "studentToken",[
+                    "studentToken", [
                         "manage-practices",
                         "read-practices",
                         "read-company",
@@ -236,7 +261,8 @@ class UserController extends Controller {
         return response($response, 201);
     }
 
-    public function logout(Request $request) {
+    public function logout(Request $request)
+    {
         auth()->user()->tokens()->delete();
 
         return [
@@ -244,7 +270,8 @@ class UserController extends Controller {
         ];
     }
 
-    public function forgotPassword(Request $request) {
+    public function forgotPassword(Request $request)
+    {
         $request->validate(['email' => 'required|email']);
 
         $status = Password::sendResetLink(
@@ -252,15 +279,17 @@ class UserController extends Controller {
         );
 
         return $status === Password::RESET_LINK_SENT
-                    ? response(['status' => __($status)])
-                    : response(['email' => __($status)]);
+            ? response(['status' => __($status)])
+            : response(['email' => __($status)]);
     }
 
-    public function resetToken(string $token) {
+    public function resetToken(string $token)
+    {
         return response(['token' => $token]);
     }
 
-    public function passwordReset(Request $request) {
+    public function passwordReset(Request $request)
+    {
         $request->validate([
             'token' => 'required',
             'email' => 'required|email',
@@ -281,11 +310,12 @@ class UserController extends Controller {
         );
 
         return $status === Password::PASSWORD_RESET
-                    ? response(['status' => __($status)])
-                    : response(['email' => __($status)]);
+            ? response(['status' => __($status)])
+            : response(['email' => __($status)]);
     }
 
-    public function changePassword(Request $request) {
+    public function changePassword(Request $request)
+    {
         $fields = $request->validate([
             'email' => 'required|string',
             'password' => 'required|string',
@@ -310,5 +340,61 @@ class UserController extends Controller {
 
         return response("Password changed");
 
+    }
+
+    public function showByDepartment(DepartmentEmployee $departmentEmployee)
+    {
+        $users = DepartmentEmployee::find($departmentEmployee->id)->users()->paginate(10);
+        return response($users);
+    }
+
+    public function destroy(User $user)
+    {
+        $user->deactivate = 1;
+        $user->save();
+        return response()->json(['message' => 'Úspešne deaktivovaný']);
+    }
+
+    public function delete(User $user)
+    {
+        $practices = Practice::where('user_id', $user->id)->get();
+        if ($practices->isEmpty()) {
+            $departmentEmployees = DepartmentEmployee::where('user_id', $user->id)->get();
+            $companyEmployees = CompanyEmployee::where('user_id', $user->id)->get();
+            if ($departmentEmployees->isEmpty() && $companyEmployees->isEmpty()) {
+                $user->delete();
+
+                return response()->json([
+                    'message' => 'Používateľ bol úspešne odstránený.',
+                ]);
+            } else {
+                return response()->json([
+                    'message' => 'Používateľ nie je možné odstrániť, pretože je priradený k pracoviskám alebo spoločnostiam.',
+                ], 422);
+            }
+        } else {
+            return response()->json([
+                'message' => 'Používateľ nie je možné odstrániť, pretože je priradený k praxiam.',
+            ], 422);
+        }
+    }
+
+    public function show(User $user)
+    {
+        return response()->json($user);
+    }
+
+    public function showByRole(Request $request)
+    {
+        $roles = $request->query('roles');
+
+        if ($roles) {
+            $users = User::whereHas('roles', function ($query) use ($roles) {
+                $query->whereIn('roles.id', $roles);
+            })->get();
+            return response()->json($users);
+        }
+
+        return response("Nenaslo sa!!");
     }
 }
