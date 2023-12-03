@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CommentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CompanyController;
@@ -84,6 +85,23 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::post("/users", [UserController::class, "store"])->middleware(
                 'ability:create-department-head,create-department-employee,create-company-representative,create-student'
             );
+
+        Route::group(['middleware' => ['ability:manage-comments']], function () {
+
+            Route::get('/comments/practice/{practice}', [CommentController::class, 'getCommentsByPracticeId']);
+
+            Route::put('/comments/{comment}', [CommentController::class, 'update']);
+
+            Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
+
+            Route::post('/comments', [CommentController::class, 'store']);
+        });
+        Route::group(['middleware' => ['verified', 'ability:admin-comments']], function () {
+
+            Route::get('/comments', [CommentController::class, 'index']);
+
+            Route::get('/comments/user/{user}', [CommentController::class, 'getCommentsByUserId']);
+        });
 
             Route::group(['middleware' => ["ability:read-practices"]], function () {
 

@@ -34,6 +34,7 @@ class CompanyController extends Controller
         return response()->json($company);
     }
 
+
     public function show(Company $company)
     {
         return response()->json($company);

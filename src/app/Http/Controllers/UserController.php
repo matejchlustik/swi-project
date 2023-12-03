@@ -168,6 +168,8 @@ class UserController extends Controller {
                         "read-company",
                         "manage-company",
                         "edit-company",
+                        "manage-comments",
+                        "admin-comments",
                     ]
                 )->plainTextToken;
                 break;
@@ -185,6 +187,7 @@ class UserController extends Controller {
                         "read-company",
                         "manage-company",
                         "edit-company",
+                        "manage-comments",
                     ]
                 )->plainTextToken;
                 break;
@@ -201,6 +204,8 @@ class UserController extends Controller {
                         "read-company",
                         "manage-company",
                         "edit-company",
+                        "manage-comments",
+
                     ]
                 )->plainTextToken;
                 break;
@@ -220,7 +225,8 @@ class UserController extends Controller {
                     "studentToken",[
                         "manage-practices",
                         "read-practices",
-                        "read-company",
+                        "read-company",,
+                        "manage-comments",
                     ]
                 )->plainTextToken;
                 break;
