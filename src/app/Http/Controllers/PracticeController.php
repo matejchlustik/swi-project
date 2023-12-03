@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Models\Practice;
 use App\Models\PracticeRecord;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\Rules\File;
 
 
 class PracticeController extends Controller
@@ -12,14 +14,27 @@ class PracticeController extends Controller
 
     public function store(Request $request)
     {
+        $validated = $request->validate([
+            'from' => 'required|date',
+            'to' => 'required|date|after:from',
+            'company_employee_id' => 'required|integer|not_in:0',
+            'program_id' => 'required|integer|not_in:0',
+            'contract' => ["nullable",File::types(['docx', 'pdf'])]
+        ]);
         $newPractice = new Practice();
-        $newPractice->from = $request->input('from');
-        $newPractice->to = $request->input('to');
-        $newPractice->company_employee_id = $request->input('company_employee_id');
+        $newPractice->from = $validated['from'];
+        $newPractice->to = $validated['to'];
+        $newPractice->company_employee_id = $validated['company_employee_id'];
         $newPractice->department_employee_id = $request->input('department_employee_id');
-        $newPractice->program_id = $request->input('program_id');
-        $newPractice->contract = $request->input('contract');
+        $newPractice->program_id = $validated['program_id'];
         $newPractice->user_id = auth()->id();
+
+        if ($request->hasFile('contract')){
+            $file = $request->file('contract');
+            $filename = uniqid().'_'.$file->getClientOriginalName();
+            Storage::putFileAs('contracts',$file,$filename);         //ubuntu cmd: sudo chmod -R 777 storage
+            $newPractice->contract = $filename;
+        }
 
         $newPractice->save();
 
@@ -60,7 +75,7 @@ class PracticeController extends Controller
                 return response("Forbidden", 403);
             }
         }
-        
+
         return response()->json($practice->load(["companyEmployee.company","companyEmployee.user"]));
     }
 
@@ -69,10 +84,27 @@ class PracticeController extends Controller
         if(auth()->user()->role->role === "Študent") {
             if($practice->user_id !== auth()->id()) {
                 return response ("Forbidden", 403);
-            } 
+            }
         }
 
-        $practice->fill($request->all());
+         $request->validate([
+             'from' => 'date',
+             'to' => 'date|after:from',
+             'company_employee_id' => 'integer|not_in:0',
+             'program_id' => 'integer|not_in:0',
+             'contract' => ["nullable",File::types(['docx', 'pdf'])]
+         ]);
+
+        $practice->fill($request->only(['from','to','company_employee_id','program_id']));
+
+        if ($request->hasFile('contract')){
+            Storage::delete('contracts/'.$practice->contract);
+            $file = $request->file('contract');
+            $filename = uniqid().'_'.$file->getClientOriginalName();
+            Storage::putFileAs('contracts',$file,$filename);         //ubuntu cmd: sudo chmod -R 777 storage
+            $practice->contract = $filename;
+        }
+
         $practice->save();
 
         return response()->json($practice);
@@ -83,7 +115,7 @@ class PracticeController extends Controller
         if(auth()->user()->role->role === "Študent") {
             if($practice->user_id !== auth()->id()) {
                 return response ("Forbidden", 403);
-            } 
+            }
         }
 
         $practice->delete();
@@ -92,6 +124,24 @@ class PracticeController extends Controller
             'message' => 'Practice deleted successfully.',
         ]);
     }
+
+    public function download_contract(Practice $practice)
+    {
+        if(auth()->user()->role->role === "Študent") {
+            if($practice->user_id === auth()->id()) {
+                if (!empty($practice->contract)) return Storage::download('contracts/'.$practice->contract);
+                else return response()->json([
+                    'message' => 'Practice does not have contract.']);
+            } else return response ("Forbidden", 403);
+        }else {
+            if (!empty($practice->contract)) return Storage::download('contracts/'.$practice->contract);
+            else return response()->json([
+                'message' => 'Practice does not have contract.']);
+        }
+    }
+
+
+
 
 
 }
