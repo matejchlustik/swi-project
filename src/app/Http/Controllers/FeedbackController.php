@@ -50,7 +50,7 @@ class FeedbackController extends Controller
 
     public function getFeedbacksByUserId(User $user)
     {
-        $feedback = Feedback::where('user_id', $user->id)->get();
+        $feedback = Feedback::where('user_id', auth()->user()->id );
 
         return response($feedback);
     }

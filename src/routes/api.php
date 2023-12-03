@@ -89,9 +89,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         });
         Route::group(['middleware' => ['verified', 'ability:admin-feedback']], function () {
 
-            Route::get('/feedback', [CommentController::class, 'index']);
+            Route::get('/feedback', [FeedbackController::class, 'index']);
 
-            Route::get('/feedback/user/{user}', [CommentController::class, 'getfeedbacksByUserId']);
+            Route::get('/feedback/user/{user}', [FeedbackController::class, 'getfeedbacksByUserId']);
+        });
+        Route::group(['middleware' => ["ability:read-feedback"]], function () {
+            Route::get('/feedback', [FeedbackController::class, 'index']);
+            Route::get('/feedback/{feedback}', [FeedbackController::class, "show"]);
         });
     
     });
