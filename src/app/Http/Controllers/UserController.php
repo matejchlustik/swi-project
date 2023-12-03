@@ -89,6 +89,11 @@ class UserController extends Controller {
                             'user_id' => $newUser->id,
                             'department_id' => $fields['department_id']
                         ]);
+                        Password::sendResetLink(
+                            [
+                                'email' => $fields['email']
+                            ]
+                        );
                         $newUser->markEmailAsVerified();
                         return response('User created', 201);
                     } else return response('Forbidden', 403);
@@ -104,6 +109,11 @@ class UserController extends Controller {
                             'user_id' => $newUser->id,
                             'department_id' => $fields['department_id']
                         ]);
+                        Password::sendResetLink(
+                            [
+                                'email' => $fields['email']
+                            ]
+                        );
                         $newUser->markEmailAsVerified();
                         return response('User created', 201);
                     } else return response('Forbidden', 403);
@@ -120,6 +130,11 @@ class UserController extends Controller {
                             'company_id' => $fields['company_id'],
                             'phone' => $fields['phone']
                         ]);
+                        Password::sendResetLink(
+                            [
+                                'email' => $fields['email']
+                            ]
+                        );
                         $newUser->markEmailAsVerified();
                         return response('User created', 201);
                     } else return response('Forbidden', 403);
@@ -129,6 +144,11 @@ class UserController extends Controller {
                 if (auth()->user()->tokenCan('create-student')) {
 
                     $newUser = createUser($fields);
+                    Password::sendResetLink(
+                        [
+                            'email' => $fields['email']
+                        ]
+                    );
                     $newUser->markEmailAsVerified();
                     return response('User created', 201);
                 } else return response('Forbidden', 403);
