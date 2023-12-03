@@ -33,9 +33,8 @@ class CommentController extends Controller
             $validatedData = $request->validate([
                 'body' => 'required',
                 'practice_id' => 'required|exists:practices,id',
-                'user_id' => auth()->user()->id
             ]);
-            $comment = Comment::create($validatedData);
+            $comment = Comment::create([...$validatedData, 'user_id' => auth()->user()->id]);
             return response()->json($comment);
     }
 
@@ -68,6 +67,6 @@ class CommentController extends Controller
         }
         }
         $comment->delete();
-        return response()->json(['message' => 'Company deleted successfully.',]);
+        return response()->json(['message' => 'Comment deleted successfully.']);
     }
 }
