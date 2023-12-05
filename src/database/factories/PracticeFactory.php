@@ -3,6 +3,7 @@
 namespace Database\Factories;
 
 use App\Models\Practice;
+use App\Models\PracticeStatus;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -26,6 +27,7 @@ class PracticeFactory extends Factory
             'department_employee_id' => null,
             'program_id' => 2,
             'contract' => 'cesta ku suboru',
+            'practice_status_id' => PracticeStatus::firstWhere("status", "Neschválená")->id
         ];
     }
 }
