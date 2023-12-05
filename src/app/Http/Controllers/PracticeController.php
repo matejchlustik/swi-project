@@ -3,10 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Practice;
-use App\Models\PracticeRecord;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
+use App\Models\PracticeRecord;
+use App\Models\PracticeStatus;
 use Illuminate\Validation\Rules\File;
+use Illuminate\Support\Facades\Storage;
 
 
 class PracticeController extends Controller
@@ -19,9 +20,11 @@ class PracticeController extends Controller
             'to' => 'required|date|after:from',
             'company_employee_id' => 'required|integer|not_in:0',
             'program_id' => 'required|integer|not_in:0',
-            'contract' => ["nullable",File::types(['docx', 'pdf'])]
+            'contract' => ["nullable",File::types(['docx', 'pdf'])],
+            
         ]);
         $newPractice = new Practice();
+        $newPractice->practice_status_id = PracticeStatus::firstWhere("status", "Neschválená")->id;
         $newPractice->from = $validated['from'];
         $newPractice->to = $validated['to'];
         $newPractice->company_employee_id = $validated['company_employee_id'];
@@ -92,10 +95,20 @@ class PracticeController extends Controller
              'to' => 'date|after:from',
              'company_employee_id' => 'integer|not_in:0',
              'program_id' => 'integer|not_in:0',
-             'contract' => ["nullable",File::types(['docx', 'pdf'])]
+             'contract' => ["nullable",File::types(['docx', 'pdf'])],
+             'practice_status_id' => 'integer|exists:practice_statuses,id'
          ]);
 
         $practice->fill($request->only(['from','to','company_employee_id','program_id']));
+
+        $userRole = auth()->user()->role->role;
+        if($userRole === "Admin" || $userRole === "Vedúci pracoviska" || $userRole === "Poverený pracovník pracoviska") {
+            if($request->has('practice_status_id')) {
+                $practice->practice_status_id = $request["practice_status_id"];
+            }
+        } else {
+            return response("Cannot change practice status", 403);
+        }
 
         if ($request->hasFile('contract')){
             Storage::delete('contracts/'.$practice->contract);
