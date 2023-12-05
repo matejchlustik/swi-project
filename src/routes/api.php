@@ -86,22 +86,22 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
                 'ability:create-department-head,create-department-employee,create-company-representative,create-student'
             );
 
-        Route::group(['middleware' => ['ability:manage-comments']], function () {
+            Route::group(['middleware' => ['ability:manage-comments']], function () {
 
-            Route::get('/comments/practice/{practice}', [CommentController::class, 'getCommentsByPracticeId']);
+                Route::get('/comments/practice/{practice}', [CommentController::class, 'getCommentsByPracticeId']);
 
-            Route::put('/comments/{comment}', [CommentController::class, 'update']);
+                Route::put('/comments/{comment}', [CommentController::class, 'update']);
 
-            Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
+                Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
 
-            Route::post('/comments', [CommentController::class, 'store']);
-        });
-        Route::group(['middleware' => ['verified', 'ability:admin-comments']], function () {
+                Route::post('/comments', [CommentController::class, 'store']);
+            });
+            Route::group(['middleware' => ['verified', 'ability:admin-comments']], function () {
 
-            Route::get('/comments', [CommentController::class, 'index']);
+                Route::get('/comments', [CommentController::class, 'index']);
 
-            Route::get('/comments/user/{user}', [CommentController::class, 'getCommentsByUserId']);
-        });
+                Route::get('/comments/user/{user}', [CommentController::class, 'getCommentsByUserId']);
+            });
 
             Route::group(['middleware' => ["ability:read-practices"]], function () {
 
@@ -126,26 +126,31 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
                 Route::delete('/practices/{practice}', [PracticeController::class, "destroy"]);
 
                 Route::get('/practices/{practice}/contract', [PracticeController::class, "download_contract"]);
+
             });
-        Route::group(['middleware' => ["ability:edit-company"]], function () {
 
-            Route::put("/companies/{company}", [CompanyController::class, "update"]);
+            Route::group(['middleware' => ["ability:filter-practices"]], function () {
 
-        });
-        Route::group(['middleware' => ["ability:read-company"]], function () {
+                Route::get('/practices/programs/{program}', [PracticeController::class, "getPracticesByProgram"]);
+
+                Route::get('/practices/practice-statuses/{status}', [PracticeController::class, "getPracticesByPracticeStatus"]);
+            });
+
+            Route::put("/companies/{company}", [CompanyController::class, "update"])->middleware('ability:edit-company');
 
             Route::get("/companies", [CompanyController::class, "index"]);
 
             Route::get("/companies/{company}", [CompanyController::class, "show"]);
 
-        });
-    });
-    Route::group(['middleware' => ["ability:manage-company"]], function () {
+            Route::group(['middleware' => ["ability:manage-company"]], function () {
 
-        Route::delete("/companies/{company}", [CompanyController::class, "destroy"]);
+                Route::delete("/companies/{company}", [CompanyController::class, "destroy"]);
+    
+                Route::post("/companies", [CompanyController::class, "store"]);
+            });
 
-        Route::post("/companies", [CompanyController::class, "store"]);
     });
+        
 
 
 });

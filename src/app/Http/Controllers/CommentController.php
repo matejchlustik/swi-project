@@ -23,9 +23,9 @@ class CommentController extends Controller
     }
     public function getCommentsByPracticeId(Practice $practice)
     {
-        $practices = Practice::find($practice->id);
+        $comments = Comment::where("practice_id", $practice->id)->get();
 
-        return response($practices);
+        return response($comments);
     }
 
     public function store(Request $request)
