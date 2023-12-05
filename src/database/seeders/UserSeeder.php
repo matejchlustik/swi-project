@@ -20,6 +20,7 @@ class UserSeeder extends Seeder {
                 'password' => Hash::make('123'),
                 'role_id' => 1,
                 'email_verified_at' => now(),
+                'from'=>now(),
             ],
             [
                 'first_name' => 'Zdeno',
@@ -28,6 +29,7 @@ class UserSeeder extends Seeder {
                 'password' => Hash::make('123'),
                 'role_id' => 2,
                 'email_verified_at' => now(),
+                'from'=>now(),
             ],
             [
                 'first_name' => 'Zdeno',
@@ -36,6 +38,7 @@ class UserSeeder extends Seeder {
                 'password' => Hash::make('123'),
                 'role_id' => 3,
                 'email_verified_at' => now(),
+                'from'=>now(),
             ],
             [
                 'first_name' => 'Zdeno',
@@ -44,6 +47,7 @@ class UserSeeder extends Seeder {
                 'password' => Hash::make('123'),
                 'role_id' => 4,
                 'email_verified_at' => now(),
+                'from'=>now(),
             ],
             [
                 'first_name' => 'Zdeno',
@@ -52,6 +56,7 @@ class UserSeeder extends Seeder {
                 'password' => Hash::make('123'),
                 'role_id' => 5,
                 'email_verified_at' => now(),
+                'from'=>now(),
             ],
         ]);
         DB::table('department_employees')->insert([

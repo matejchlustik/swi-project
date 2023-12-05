@@ -108,7 +108,8 @@ class UserController extends Controller
 
                             DepartmentEmployee::create([
                                 'user_id' => $newUser->id,
-                                'department_id' => $fields['department_id']
+                                'department_id' => $fields['department_id'],
+                                'from'=>now()
                             ]);
                             $newUser->markEmailAsVerified();
                             return response('User created', 201);
@@ -125,7 +126,8 @@ class UserController extends Controller
 
                             DepartmentEmployee::create([
                                 'user_id' => $newUser->id,
-                                'department_id' => $fields['department_id']
+                                'department_id' => $fields['department_id'],
+                                'from'=>now()
                             ]);
                             $newUser->markEmailAsVerified();
                             return response('User created', 201);
@@ -177,88 +179,92 @@ class UserController extends Controller
                 'message' => 'Incorrect credentials'
             ], 401);
         }
-        switch ($user->role->id) {
-            case 1:
-                $token = $user->createToken(
-                    "adminToken",
-                    [
-                        "create-department-head",
-                        "create-department-employee",
-                        "create-company-representative",
-                        "create-student",
-                        "manage-practices",
-                        "read-practices",
-                        "manage-practice-offers",
-                        "manage-company-department",
-                        "read-company",
-                        "manage-company",
-                        "edit-company",
-                    ]
-                )->plainTextToken;
-                break;
-            case 2:
-                $token = $user->createToken(
-                    "departmentHeadToken",
-                    [
-                        "create-department-employee",
-                        "create-company-representative",
-                        "create-student",
-                        "manage-practices",
-                        "read-practices",
-                        "manage-practice-offers",
-                        "manage-company-department",
-                        "read-company",
-                        "manage-company",
-                        "edit-company",
-                    ]
-                )->plainTextToken;
-                break;
-            case 3:
-                $token = $user->createToken(
-                    "departmentEmployeeToken",
-                    [
-                        "create-company-representative",
-                        "create-student",
-                        "manage-practices",
-                        "read-practices",
-                        "manage-practice-offers",
-                        "manage-company-department",
-                        "read-company",
-                        "manage-company",
-                        "edit-company",
-                    ]
-                )->plainTextToken;
-                break;
-            case 4:
-                $token = $user->createToken(
-                    "companyRepresentativeToken",
-                    [
-                        "read-practices",
-                        "manage-practice-offers",
-                        "read-company",
-                        "edit-company",
-                    ]
-                )->plainTextToken;
-                break;
-            case 5:
-                $token = $user->createToken(
-                    "studentToken", [
-                        "manage-practices",
-                        "read-practices",
-                        "read-company",
-                    ]
-                )->plainTextToken;
-                break;
-            default:
-                return response('Wrong role_id', 401);
+        if (!$this->deactivated($user)) {
+
+            switch ($user->role->id) {
+                case 1:
+                    $token = $user->createToken(
+                        "adminToken",
+                        [
+                            "create-department-head",
+                            "create-department-employee",
+                            "create-company-representative",
+                            "create-student",
+                            "manage-practices",
+                            "read-practices",
+                            "manage-practice-offers",
+                            "manage-company-department",
+                            "read-company",
+                            "manage-company",
+                            "edit-company",
+                        ]
+                    )->plainTextToken;
+                    break;
+                case 2:
+                    $token = $user->createToken(
+                        "departmentHeadToken",
+                        [
+                            "create-department-employee",
+                            "create-company-representative",
+                            "create-student",
+                            "manage-practices",
+                            "read-practices",
+                            "manage-practice-offers",
+                            "manage-company-department",
+                            "read-company",
+                            "manage-company",
+                            "edit-company",
+                        ]
+                    )->plainTextToken;
+                    break;
+                case 3:
+                    $token = $user->createToken(
+                        "departmentEmployeeToken",
+                        [
+                            "create-company-representative",
+                            "create-student",
+                            "manage-practices",
+                            "read-practices",
+                            "manage-practice-offers",
+                            "manage-company-department",
+                            "read-company",
+                            "manage-company",
+                            "edit-company",
+                        ]
+                    )->plainTextToken;
+                    break;
+                case 4:
+                    $token = $user->createToken(
+                        "companyRepresentativeToken",
+                        [
+                            "read-practices",
+                            "manage-practice-offers",
+                            "read-company",
+                            "edit-company",
+                        ]
+                    )->plainTextToken;
+                    break;
+                case 5:
+                    $token = $user->createToken(
+                        "studentToken", [
+                            "manage-practices",
+                            "read-practices",
+                            "read-company",
+                        ]
+                    )->plainTextToken;
+                    break;
+                default:
+                    return response('Wrong role_id', 401);
+            }
+
+            $response = [
+                'user' => $user,
+                'token' => $token
+            ];
+
+            return response($response, 201);
         }
-
-        $response = [
-            'user' => $user,
-            'token' => $token
-        ];
-
-        return response($response, 201);
+        else{return response("Your account is deactivated");}
     }
 
     public function logout(Request $request)
@@ -272,15 +278,19 @@ class UserController extends Controller
 
     public function forgotPassword(Request $request)
     {
-        $request->validate(['email' => 'required|email']);
+        if (!$this->deactivated()) {
+            $request->validate(['email' => 'required|email']);
 
-        $status = Password::sendResetLink(
-            $request->only('email')
-        );
 
-        return $status === Password::RESET_LINK_SENT
-            ? response(['status' => __($status)])
-            : response(['email' => __($status)]);
+            $status = Password::sendResetLink(
+                $request->only('email')
+            );
+
+            return $status === Password::RESET_LINK_SENT
+                ? response(['status' => __($status)])
+                : response(['email' => __($status)]);
+        }
+        else{return response("Your account is deactivated");}
     }
 
     public function resetToken(string $token)
@@ -339,7 +349,6 @@ class UserController extends Controller
         event(new PasswordReset($user));
 
         return response("Password changed");
-
     }
 
     public function showByDepartment(DepartmentEmployee $departmentEmployee)
@@ -348,14 +357,15 @@ class UserController extends Controller
         return response($users);
     }
 
-    public function destroy(User $user)
+    public function deactivate(User $user)
     {
         $user->deactivate = 1;
+        $user->tokens()->delete();
         $user->save();
         return response()->json(['message' => 'Úspešne deaktivovaný']);
     }
 
-    public function delete(User $user)
+    public function destroy(User $user)
     {
         $practices = Practice::where('user_id', $user->id)->get();
         if ($practices->isEmpty()) {
@@ -386,15 +396,101 @@ class UserController extends Controller
 
     public function showByRole(Request $request)
     {
-        $roles = $request->query('roles');
+        $roles = $request->query('role_id');
 
         if ($roles) {
-            $users = User::whereHas('roles', function ($query) use ($roles) {
-                $query->whereIn('roles.id', $roles);
+            $users = User::whereHas('role_id', function ($query) use ($roles) {
+                $query->whereIn('role.id', $roles);
             })->get();
             return response()->json($users);
         }
 
         return response("Nenaslo sa!!");
     }
+
+    public function deactivated(User $user)
+    {
+        if ($user->deactivate === 1) {
+            return true;
+        }return false;
+    }
+
+    public function update(Request $request, User $user)
+    {
+        if (isset($fields['role_id'])) {
+            return response('Cannot change role', 400);
+        }
+        $fields = $request->all();
+        $userRole = $user->role->role;
+        if (auth()->user()->id === $user->id) {
+            $validate = $request->validate([
+                'first_name' => 'string',
+                'last_name' => 'string',
+                'email' => 'email',
+            ]);
+            if ($validate['email']!==null) {
+                //verification
+            }
+            $user->fill($validate);
+            $user->save();
+
+            return response('User updated');
+        }
+
+        if (auth()->user()->tokenCan("manage-users")) {
+            $this->updateUser($user, $fields, $userRole);
+            return response('User updated');
+        }
+        if (auth()->user()->tokenCan("manage-wo-admin")) {
+            if ($userRole === "Admin" || $userRole === "Vedúci pracoviska") {return response("You can't update admin or department head ",403);}
+
+                if ($userRole === "Poverený pracovník pracoviska"){
+                    if ($user->department->id === auth()->user()->department->id){
+                        $this->updateUser($user, $fields, $userRole);
+                        return response('User updated');
+                    } else {return response("You can't update someone out of your department ",403);}
+                }
+            else {$this->updateUser($user, $fields, $userRole);return response('User updated');}
+        }
+        if (auth()->user()->tokenCan("manage-wo-admin-wo-dephead")) {
+
+            if ($userRole === "Admin" || $userRole === "Vedúci pracoviska" || $userRole === "Poverený pracovník pracoviska") {
+                return response("You can't update admin or department head ", 403);
+            } else {
+                $this->updateUser($user, $fields, $userRole);
+                return response('User updated');
+            }
+        }
+    }
+
+
+    public function updateUser($user,$fields,$userRole)
+    {
+        $user->fill($fields);
+        $user->save();
+        if (($fields['company_id'] || $fields['phone']) && $userRole === "Zástupca firmy") {
+            $companyEmployee = CompanyEmployee::where('user_id',$user->id);
+            $companyEmployee->fill($fields);
+            $companyEmployee->save();
+        }
+        if($userRole==="Poverený pracovník pracoviska" ||$userRole==="Vedúci pracoviska"){
+            $departmentEmployee=DepartmentEmployee::where('user_id',$user->id);
+            if($fields["department_id"]){
+                $departmentEmployee->to=now();
+                $departmentEmployee->save();
+                $newDepartmentEmployee=DepartmentEmployee::create([
+                    'user_id'=>$user->id,
+                    'department_id'=>$fields['department_id'],
+                    'from'=>now()
+                ]);
+            }
+            else{
+                $departmentEmployee->fill($fields);
+                $departmentEmployee->save();
+            }
+        }
+        // AK MENIM VEDUCEHO PRACOVISKA ALEBO POVERENEHO PRACOVNIKA NASTAVIM ATRIBUT to NA DATUM NOW() A PRIDAM NOVY RIADOK DO DEPARTMENT EMPLOYEE KDE BUDE from NOW() A to NULL
+    }
+
+
 }

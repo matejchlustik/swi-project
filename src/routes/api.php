@@ -65,7 +65,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::get("/practice_offers/companies/{company}", [PracticeOffersController::class, "showByCompany"]);
 
             Route::group(['middleware' => ["ability:manage-company-department"]], function () {
-                
+
                 Route::get("/company_department", [CompanyDepartmentController::class, "index"]);
 
                 Route::post("/company_department", [CompanyDepartmentController::class, "store"]);
@@ -80,7 +80,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
                 Route::get("/company_department/companies/{company}", [CompanyDepartmentController::class, "showByCompany"]);
             });
-            
+
             Route::post("/users", [UserController::class, "store"])->middleware(
                 'ability:create-department-head,create-department-employee,create-company-representative,create-student'
             );
@@ -88,23 +88,23 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::group(['middleware' => ["ability:read-practices"]], function () {
 
                 Route::get('/practice_records/practices/{practice}', [PracticeRecordsController::class, "index"]);
-    
+
                 Route::get('/practices', [PracticeController::class, "index"]);
-    
+
                 Route::get('/practices/{practice}', [PracticeController::class, "show"]);
             });
             Route::group(['middleware' => ["ability:manage-practices"]], function () {
-    
+
                 Route::post('/practice_records', [PracticeRecordsController::class, "store"]);
-    
+
                 Route::put('/practice_records/{practice_record}', [PracticeRecordsController::class, "update"]);
-    
+
                 Route::delete('/practice_records/{practice_record}', [PracticeRecordsController::class, "destroy"]);
-    
+
                 Route::post('/practices', [PracticeController::class, "store"]);
-    
+
                 Route::put('/practices/{practice}', [PracticeController::class, "update"]);
-    
+
                 Route::delete('/practices/{practice}', [PracticeController::class, "destroy"]);
             });
         Route::group(['middleware' => ["ability:edit-company"]], function () {
@@ -126,6 +126,27 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
         Route::post("/companies", [CompanyController::class, "store"]);
     });
+    Route::group(['middleware' => ["ability:manage-users"]], function () {
+        Route::get("/user", [UserController::class, "index"]);
 
+        Route::get("/user/role", [UserController::class, "showByRole"]);
 
+        Route::get("/user/{user}", [UserController::class, "show"]);
+
+        Route::delete('/user/{user}', [UserController::class, "destroy"]);
+
+        Route::post('/user/{user}', [UserController::class, "deactivate"]);
+
+        Route::put('/user/{user}', [UserController::class, "update"]);
+
+        Route::get("/user/department/{department}", [UserController::class, "showByDepartment"]);
+
+        Route::post('/user', [UserController::class, "store"]);
+    });
+    Route::group(['middleware' => ["ability:manage-wo-admin"]], function () {
+
+    });
+    Route::group(['middleware' => ["ability:manage-wo-admin-wo-dephead"]], function () {
+
+    });
 });

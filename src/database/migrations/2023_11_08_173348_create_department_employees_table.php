@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained();
             $table->foreignId('department_id')->constrained();
+            $table->date('from');
+            $table->date('to');
         });
     }
 
