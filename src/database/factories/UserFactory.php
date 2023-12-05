@@ -25,7 +25,6 @@ class UserFactory extends Factory
             'password' => Hash::make('123'),
             'role_id' => 5,
             'email_verified_at' => now(),
-            'from'=>now()
         ];
     }
 
