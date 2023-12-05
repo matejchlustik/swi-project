@@ -474,7 +474,7 @@ class UserController extends Controller
             $companyEmployee->save();
         }
         if($userRole==="Poverený pracovník pracoviska" ||$userRole==="Vedúci pracoviska"){
-            $departmentEmployee=DepartmentEmployee::where('user_id',$user->id);
+            $departmentEmployee=DepartmentEmployee::where('user_id',$user->id)->where('to',null);
             if($fields["department_id"]){
                 $departmentEmployee->to=now();
                 $departmentEmployee->save();
