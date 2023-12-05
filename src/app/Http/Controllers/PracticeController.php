@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Program;
 use App\Models\Practice;
 use Illuminate\Http\Request;
 use App\Models\PracticeRecord;
@@ -153,7 +154,17 @@ class PracticeController extends Controller
         }
     }
 
+    public function getPracticesByPracticeStatus(PracticeStatus $practiceStatus) {
+        $practices = Practice::where('practice_status_id', $practiceStatus->id)->latest()->paginate(10);
 
+        return response($practices);
+    }
+
+    public function getPracticesByProgram(Program $program) {
+        $practices = Practice::where('program_id', $program->id)->latest()->paginate(10);
+
+        return response($practices);
+    }
 
 
 

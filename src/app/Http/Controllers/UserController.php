@@ -185,11 +185,11 @@ class UserController extends Controller {
                         "read-practices",
                         "manage-practice-offers",
                         "manage-company-department",
-                        "read-company",
                         "manage-company",
                         "edit-company",
                         "manage-comments",
                         "admin-comments",
+                        "filter-practices",
                     ]
                 )->plainTextToken;
                 break;
@@ -204,10 +204,10 @@ class UserController extends Controller {
                         "read-practices",
                         "manage-practice-offers",
                         "manage-company-department",
-                        "read-company",
                         "manage-company",
                         "edit-company",
                         "manage-comments",
+                        "filter-practices",
                     ]
                 )->plainTextToken;
                 break;
@@ -221,11 +221,10 @@ class UserController extends Controller {
                         "read-practices",
                         "manage-practice-offers",
                         "manage-company-department",
-                        "read-company",
                         "manage-company",
                         "edit-company",
                         "manage-comments",
-
+                        "filter-practices",
                     ]
                 )->plainTextToken;
                 break;
@@ -235,7 +234,6 @@ class UserController extends Controller {
                     [
                         "read-practices",
                         "manage-practice-offers",
-                        "read-company",
                         "edit-company",
                     ]
                 )->plainTextToken;
@@ -245,7 +243,6 @@ class UserController extends Controller {
                     "studentToken",[
                         "manage-practices",
                         "read-practices",
-                        "read-company",
                         "manage-comments",
                     ]
                 )->plainTextToken;
