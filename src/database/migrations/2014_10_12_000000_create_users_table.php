@@ -18,7 +18,8 @@ return new class extends Migration
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
-            $table->boolean("deactivate");
+            //$table->boolean("deactivate");
+            $table->softDeletes();
             $table->rememberToken();
             $table->timestamps();
         });

@@ -22,17 +22,21 @@ class UserController extends Controller
 {
     public function index()
     {
-        $companies = User::paginate(20);
+        $users = User::paginate(20);
+
+        // Kontrola, či používateľ nie je admin, ak nie je, získa iba nezmazaných používateľov
+        if (auth()->user()->role->role !== "Admin") {
+            $users->whereNull('deleted_at');
+        }
 
         return response([
-            'items' => $companies->items(),
-            'prev_page_url' => $companies->previousPageUrl(),
-            'next_page_url' => $companies->nextPageUrl(),
-            'last_page' => $companies->lastPage(),
-            'total' => $companies->total()
+            'items' => $users->items(),
+            'prev_page_url' => $users->previousPageUrl(),
+            'next_page_url' => $users->nextPageUrl(),
+            'last_page' => $users->lastPage(),
+            'total' => $users->total()
         ]);
     }
-
     public function register(Request $request)
     {
         $fields = $request->validate([
@@ -197,6 +201,9 @@ class UserController extends Controller
                             "read-company",
                             "manage-company",
                             "edit-company",
+                            "manage-company",
+                            "manage-wo-admin",
+                            "manage-users"
                         ]
                     )->plainTextToken;
                     break;
@@ -214,6 +221,7 @@ class UserController extends Controller
                             "read-company",
                             "manage-company",
                             "edit-company",
+                            "manage-wo-admin"
                         ]
                     )->plainTextToken;
                     break;
@@ -230,6 +238,7 @@ class UserController extends Controller
                             "read-company",
                             "manage-company",
                             "edit-company",
+                            "manage-wo-admin"
                         ]
                     )->plainTextToken;
                     break;
@@ -241,6 +250,7 @@ class UserController extends Controller
                             "manage-practice-offers",
                             "read-company",
                             "edit-company",
+                            "manage-wo-admin-wo-dephead"
                         ]
                     )->plainTextToken;
                     break;
@@ -250,6 +260,7 @@ class UserController extends Controller
                             "manage-practices",
                             "read-practices",
                             "read-company",
+                           "manage-wo-admin-wo-dephead"
                         ]
                     )->plainTextToken;
                     break;
@@ -278,9 +289,9 @@ class UserController extends Controller
 
     public function forgotPassword(Request $request)
     {
-        if (!$this->deactivated()) {
-            $request->validate(['email' => 'required|email']);
 
+            $request->validate(['email' => 'required|email']);
+        if (!$this->deactivated()) {
 
             $status = Password::sendResetLink(
                 $request->only('email')
@@ -351,18 +362,28 @@ class UserController extends Controller
         return response("Password changed");
     }
 
-    public function showByDepartment(DepartmentEmployee $departmentEmployee)
+    public function showByDepartment(Department $department)
     {
-        $users = DepartmentEmployee::find($departmentEmployee->id)->users()->paginate(10);
+        $users = Department::find($department->id)->users()->paginate(10);
+
+        // Kontrola, či používateľ nie je admin, ak nie je, získa iba nezmazaných používateľov
+        if (auth()->user()->role->role !== "Admin") {
+            $users->whereNull('deleted_at');
+        }
+
         return response($users);
     }
 
     public function deactivate(User $user)
     {
-        $user->deactivate = 1;
-        $user->tokens()->delete();
+        $user->delete();
+        $user->tokens()->delete();      //toto by som asi nemal vymazavat alebo pri activate by som mal spravit token znova
         $user->save();
         return response()->json(['message' => 'Úspešne deaktivovaný']);
+    }
+    public function activate(User $user){
+        $user->restore();
+        return response()->json(['message' => 'Úspešne reaktovovaný']);
     }
 
     public function destroy(User $user)
@@ -372,7 +393,7 @@ class UserController extends Controller
             $departmentEmployees = DepartmentEmployee::where('user_id', $user->id)->get();
             $companyEmployees = CompanyEmployee::where('user_id', $user->id)->get();
             if ($departmentEmployees->isEmpty() && $companyEmployees->isEmpty()) {
-                $user->delete();
+                $user->forceDelete();
 
                 return response()->json([
                     'message' => 'Používateľ bol úspešne odstránený.',
@@ -391,6 +412,11 @@ class UserController extends Controller
 
     public function show(User $user)
     {
+        // Kontrola, či používateľ nie je admin a záznam nie je soft deleted
+        if (auth()->user()->role->role !== "Admin" && $user->trashed()) {
+            return response("User thrashed", 403);
+        }
+
         return response()->json($user);
     }
 
@@ -398,21 +424,27 @@ class UserController extends Controller
     {
         $roles = $request->query('role_id');
 
+        $users = User::query();
+
         if ($roles) {
-            $users = User::whereHas('role_id', function ($query) use ($roles) {
+            $users->whereHas('role_id', function ($query) use ($roles) {
                 $query->whereIn('role.id', $roles);
-            })->get();
-            return response()->json($users);
+            });
         }
 
-        return response("Nenaslo sa!!");
+        // Kontrola, či používateľ nie je admin, ak nie je, získa iba nezmazaných používateľov
+        if (auth()->user()->role->role !== "Admin") {
+            $users->whereNull('deleted_at');
+        }
+
+        $result = $users->get();
+
+        return response()->json($result);
     }
 
     public function deactivated(User $user)
     {
-        if ($user->deactivate === 1) {
-            return true;
-        }return false;
+        return $user->trashed() ? 'true' : 'false';
     }
 
     public function update(Request $request, User $user)
@@ -489,7 +521,6 @@ class UserController extends Controller
                 $departmentEmployee->save();
             }
         }
-        // AK MENIM VEDUCEHO PRACOVISKA ALEBO POVERENEHO PRACOVNIKA NASTAVIM ATRIBUT to NA DATUM NOW() A PRIDAM NOVY RIADOK DO DEPARTMENT EMPLOYEE KDE BUDE from NOW() A to NULL
     }
 
 
