@@ -91,7 +91,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
             Route::get('/feedback', [FeedbackController::class, 'index']);
 
-            Route::get('/feedback/user/{user}', [FeedbackController::class, 'getfeedbacksByUserId']);
+            Route::get('/feedback/user/{user}', [FeedbackController::class, 'getFeedbacksByUserId']);
         });
         Route::group(['middleware' => ["ability:read-feedback"]], function () {
             Route::get('/feedback', [FeedbackController::class, 'index']);

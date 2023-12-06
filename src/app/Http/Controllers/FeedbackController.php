@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\User;
 use App\Models\Feedback;
 use App\Models\Practice;
 use Illuminate\Http\Request;
@@ -22,9 +23,8 @@ class FeedbackController extends Controller
     }
     public function getFeedbacksByPracticeId(Practice $practice)
     {
-        $practices = Practice::find($practice->id);
-
-        return response($practices);
+        $feedback = Feedback::where("practice_id", $practice->id)->get();
+        return response($feedback);
     }
 
     public function store(Request $request)
@@ -32,9 +32,8 @@ class FeedbackController extends Controller
         $validatedData = $request->validate([
             'body' => 'required',
             'practice_id' => 'required|exists:practices,id',
-            'user_id' => 'required|exists:users,id'
         ]);
-        $feedback = Feedback::create($validatedData);
+        $feedback = Feedback::create([...$validatedData, 'user_id' => auth()->user()->id]);
         return response()->json($feedback);
 
     }
@@ -46,11 +45,18 @@ class FeedbackController extends Controller
                 return response("Forbidden", 403);
             }
         }
+        $validatedData = $request->validate([
+            'body' => 'required',
+        ]);
+            $feedback->fill($validatedData);
+            $feedback->save();
+
+            return response()->json($feedback);
     }
 
     public function getFeedbacksByUserId(User $user)
     {
-        $feedback = Feedback::where('user_id', auth()->user()->id );
+        $feedback = Feedback::where('user_id', $user->id)->get();
 
         return response($feedback);
     }
@@ -62,7 +68,8 @@ class FeedbackController extends Controller
                 return response("Forbidden", 403);
         }
         }
-            return response($feedback->delete());
+        $feedback->delete();
+        return response()->json(['message' => 'Feedback deleted successfully.']);
     }
 
 }
