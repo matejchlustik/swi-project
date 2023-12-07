@@ -252,7 +252,7 @@ class UserController extends Controller {
                     "studentToken",[
                         "manage-practices",
                         "read-practices",
-                        "manage-comments",,
+                        "manage-comments",
                         "manage-feedback",
                         "read-feedback",
                     ]

@@ -45,6 +45,6 @@ class DatabaseSeeder extends Seeder
         CompanyDepartment::factory(30)->create();
         PracticeOffer::factory(10)->create();
         Comment::factory(10)->create();
-        Feedback::factory(1)->create();
+        Feedback::factory(10)->create();
     }
 }

@@ -18,8 +18,8 @@ class FeedbackFactory extends Factory
     {
         return [
             'body' => $this->faker->realText(200),
-            'practice_id' => 1,
-            'user_id' => 1,
+            'practice_id' => $this->faker->numberBetween(1,10),
+            'user_id' => $this->faker->numberBetween(1,5),
         ];
     }
 }
