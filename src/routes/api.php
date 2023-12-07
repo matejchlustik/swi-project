@@ -4,11 +4,12 @@ use App\Http\Controllers\CommentController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CompanyController;
-use App\Http\Controllers\EmailVerificationController;
+use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\PracticeController;
 use App\Http\Controllers\PracticeRecordsController;
 use App\Http\Controllers\CompanyDepartmentController;
 use App\Http\Controllers\PracticeOffersController;
+use App\Http\Controllers\EmailVerificationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -126,7 +127,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
                 Route::delete('/practices/{practice}', [PracticeController::class, "destroy"]);
 
                 Route::get('/practices/{practice}/contract', [PracticeController::class, "download_contract"]);
-
             });
 
             Route::group(['middleware' => ["ability:filter-practices"]], function () {
@@ -149,8 +149,32 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
                 Route::post("/companies", [CompanyController::class, "store"]);
             });
 
+            Route::group(['middleware' => ["ability:manage-feedback"]], function () {
+
+                Route::get("/feedback/{feedback}", [FeedbackController::class, "store"]);
+
+                Route::delete('/feedback/{feedback}', [FeedbackController::class, "destroy"]);  
+
+                Route::put('/feedback/{feedback}', [FeedbackController::class, 'update']);
+
+                Route::get('/feedback/practice/{practice}', [FeedbackController::class, 'getFeedbacksByPracticeId']);
+            });
+            Route::group(['middleware' => ['verified', 'ability:admin-feedback']], function () {
+    
+                Route::get('/feedback', [FeedbackController::class, 'index']);
+    
+                Route::get('/feedback/user/{user}', [FeedbackController::class, 'getFeedbacksByUserId']);
+            });
+            Route::group(['middleware' => ["ability:read-feedback"]], function () {
+                
+                Route::get('/feedback', [FeedbackController::class, 'index']);
+
+                Route::get('/feedback/{feedback}', [FeedbackController::class, "show"]);
+            });
+
     });
         
 
 
 });
+

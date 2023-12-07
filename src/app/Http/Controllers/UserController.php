@@ -190,6 +190,9 @@ class UserController extends Controller {
                         "manage-comments",
                         "admin-comments",
                         "filter-practices",
+                        "manage-feedback",
+                        "admin-feedback",
+                        "read-feedback",
                     ]
                 )->plainTextToken;
                 break;
@@ -208,6 +211,8 @@ class UserController extends Controller {
                         "edit-company",
                         "manage-comments",
                         "filter-practices",
+                        "manage-feedback",
+                        "read-feedback",
                     ]
                 )->plainTextToken;
                 break;
@@ -225,6 +230,8 @@ class UserController extends Controller {
                         "edit-company",
                         "manage-comments",
                         "filter-practices",
+                        "manage-feedback",
+                        "read-feedback",
                     ]
                 )->plainTextToken;
                 break;
@@ -235,6 +242,8 @@ class UserController extends Controller {
                         "read-practices",
                         "manage-practice-offers",
                         "edit-company",
+                        "manage-feedback",
+                        "read-feedback",
                     ]
                 )->plainTextToken;
                 break;
@@ -243,7 +252,9 @@ class UserController extends Controller {
                     "studentToken",[
                         "manage-practices",
                         "read-practices",
-                        "manage-comments",
+                        "manage-comments",,
+                        "manage-feedback",
+                        "read-feedback",
                     ]
                 )->plainTextToken;
                 break;
