@@ -1,27 +1,28 @@
 <?php
 
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class DepartmentEmployee extends Model
+class Comment extends Model
 {
     use HasFactory;
-
     protected $fillable = [
+        'body',
+        'practice_id',
         'user_id',
-        'department_id',
     ];
 
-    public $timestamps = false;
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'user_id');
+        return $this->belongsTo(User::class);
     }
-    public function department()
+
+    public function practice()
     {
-        return $this->belongsTo(Department::class);
+        return $this->belongsTo(Practice::class);
     }
 }

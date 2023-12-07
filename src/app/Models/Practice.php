@@ -26,7 +26,7 @@ class Practice extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function companyEmployee() :BelongsTo 
+    public function companyEmployee() :BelongsTo
     {
         return $this->belongsTo(CompanyEmployee::class);
     }
@@ -34,7 +34,7 @@ class Practice extends Model
     public function company(): HasOneThrough
     {
         return $this->hasOneThrough(
-            Company::class, 
+            Company::class,
             CompanyEmployee::class,
             "id",
             "id",
@@ -46,5 +46,13 @@ class Practice extends Model
     public function program() :BelongsTo
     {
         return $this->belongsTo(Program::class);
+    }
+    public function feedback() :HasMany
+    {
+        return $this->hasMany(feedback::class);
+    }
+    public function comment() :HasMany
+    {
+        return $this->hasMany(Comment::class);
     }
 }

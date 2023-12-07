@@ -8,9 +8,9 @@ use App\Notifications\ResetPassword;
 use App\Notifications\VerifyEmail;
 use Illuminate\Contracts\Auth\CanResetPassword;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -77,5 +77,18 @@ class User extends Authenticatable implements MustVerifyEmail
     public function companyEmployee() :HasOne
     {
         return $this->hasOne(CompanyEmployee::class);
+    }
+    
+    public function departmentEmployee() :HasOne
+    {
+        return $this->hasOne(DepartmentEmployee::class);
+    }
+    public function comment() :HasMany
+    {
+        return $this->hasMany(Comment::class);
+    }
+    public function feedback() :HasMany
+    {
+        return $this->hasMany(feedback::class);
     }
 }
