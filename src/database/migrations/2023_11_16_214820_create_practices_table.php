@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('department_employee_id')->nullable()->constrained();
             $table->foreignId('program_id')->constrained();
             $table->string('contract',255)->nullable();
+            $table->string('completion_confirmation',255)->nullable();
             $table->timestamps();
         });
     }

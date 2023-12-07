@@ -127,6 +127,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
                 Route::delete('/practices/{practice}', [PracticeController::class, "destroy"]);
 
                 Route::get('/practices/{practice}/contract', [PracticeController::class, "download_contract"]);
+
+                Route::get('/practices/{practice}/completion_confirmation', [PracticeController::class, "generateCompletionConfirmation"]);
+                
+                Route::get('/practices/{practice}/completion_confirmation/regenerate', [PracticeController::class, "regenerateCompletionConfirmation"]);
             });
 
             Route::group(['middleware' => ["ability:filter-practices"]], function () {
@@ -171,6 +175,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
                 Route::get('/feedback/{feedback}', [FeedbackController::class, "show"]);
             });
+
+
+
 
     });
         
