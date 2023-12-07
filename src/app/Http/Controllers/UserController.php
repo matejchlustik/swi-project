@@ -23,12 +23,7 @@ class UserController extends Controller
     public function index()
     {
         $users = User::paginate(20);
-
-        // Kontrola, či používateľ nie je admin, ak nie je, získa iba nezmazaných používateľov
-        if (auth()->user()->role->role !== "Admin") {
-            $users->whereNull('deleted_at');
-        }
-
+        
         return response([
             'items' => $users->items(),
             'prev_page_url' => $users->previousPageUrl(),
