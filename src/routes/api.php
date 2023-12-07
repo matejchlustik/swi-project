@@ -85,7 +85,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
                 'ability:create-department-head,create-department-employee,create-company-representative,create-student'
             );
 
-            Route::put('/user/{user}', [UserController::class, "update"]);
 
             Route::group(['middleware' => ["ability:read-practices"]], function () {
 
@@ -130,24 +129,29 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
     Route::group(['middleware' => ["ability:manage-users"]], function () {
 
-        Route::delete('/user/{user}', [UserController::class, "destroy"]);
+        Route::get("/users/soft_deleted", [UserController::class, "indexDeleted"]);
 
-        Route::post('/user', [UserController::class, "store"]);
+        Route::delete('/users/{user}', [UserController::class, "destroy"]);
 
-        Route::post('/user/{user}', [UserController::class, "activate"]);
+        Route::post('/users', [UserController::class, "store"]);
+
+        Route::post('/users/{user}/restore', [UserController::class, "restore"])->withTrashed();
     });
-    Route::group(['middleware' => ["ability:manage-wo-admin"]], function () {
-        Route::get("/user", [UserController::class, "index"]);
+    Route::group(['middleware' => ["ability:manage-users-other"]], function () {
+        Route::get("/users", [UserController::class, "index"]);
 
-        Route::get("/user/role", [UserController::class, "showByRole"]);
+        Route::get("/users/role", [UserController::class, "showByRole"]);
 
-        Route::get("/user/{user}", [UserController::class, "show"]);
+        Route::get("/users/{user}", [UserController::class, "show"]);
 
-        Route::delete('/user/{user}', [UserController::class, "deactivate"]);
+        Route::delete('/users/{user}', [UserController::class, "deactivate"]);
 
-        Route::get("/user/department/{department}", [UserController::class, "showByDepartment"]);
+        Route::get("/users/departments/{department}", [UserController::class, "showByDepartment"]);
 
     });
+
+    Route::put('/users/{user}', [UserController::class, "update"]);
+
     Route::group(['middleware' => ["ability:manage-wo-admin-wo-dephead"]], function () {
 
     });

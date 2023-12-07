@@ -22,8 +22,25 @@ class UserController extends Controller
 {
     public function index()
     {
-        $users = User::paginate(20);
-        
+        if (auth()->user()->role->role !== "Admin") {
+            $users = User::paginate(20);
+        }else{
+            $users = User::withTrashed()->paginate(20);
+        }
+
+
+        return response([
+            'items' => $users->items(),
+            'prev_page_url' => $users->previousPageUrl(),
+            'next_page_url' => $users->nextPageUrl(),
+            'last_page' => $users->lastPage(),
+            'total' => $users->total()
+        ]);
+    }
+    public function indexDeleted()
+    {
+        $users = User::onlyTrashed()->paginate(20);
+
         return response([
             'items' => $users->items(),
             'prev_page_url' => $users->previousPageUrl(),
@@ -47,7 +64,6 @@ class UserController extends Controller
             'email' => $fields['email'],
             'password' => Hash::make($fields['password']),
             'role_id' => Role::firstWhere("role", "Študent")->id,
-            'deactivate' => 0
         ]);
 
         event(new Registered($user));
@@ -93,7 +109,6 @@ class UserController extends Controller
                 'email' => $fields['email'],
                 'password' => Hash::make('123'),
                 'role_id' => $fields['role_id'],
-                'deactivate' => 0
             ]);
         }
 
@@ -178,7 +193,6 @@ class UserController extends Controller
                 'message' => 'Incorrect credentials'
             ], 401);
         }
-        if (!$this->deactivated($user)) {
 
             switch ($user->role->id) {
                 case 1:
@@ -197,7 +211,7 @@ class UserController extends Controller
                             "manage-company",
                             "edit-company",
                             "manage-company",
-                            "manage-wo-admin",
+                            "manage-users-other",
                             "manage-users"
                         ]
                     )->plainTextToken;
@@ -216,6 +230,7 @@ class UserController extends Controller
                             "read-company",
                             "manage-company",
                             "edit-company",
+                            "manage-users-other",
                             "manage-wo-admin"
                         ]
                     )->plainTextToken;
@@ -233,7 +248,8 @@ class UserController extends Controller
                             "read-company",
                             "manage-company",
                             "edit-company",
-                            "manage-wo-admin"
+                            "manage-users-other",
+                            "manage-wo-admin-wo-dephead"
                         ]
                     )->plainTextToken;
                     break;
@@ -245,7 +261,6 @@ class UserController extends Controller
                             "manage-practice-offers",
                             "read-company",
                             "edit-company",
-                            "manage-wo-admin-wo-dephead"
                         ]
                     )->plainTextToken;
                     break;
@@ -255,7 +270,7 @@ class UserController extends Controller
                             "manage-practices",
                             "read-practices",
                             "read-company",
-                           "manage-wo-admin-wo-dephead"
+
                         ]
                     )->plainTextToken;
                     break;
@@ -269,8 +284,6 @@ class UserController extends Controller
             ];
 
             return response($response, 201);
-        }
-        else{return response("Your account is deactivated");}
     }
 
     public function logout(Request $request)
@@ -286,7 +299,7 @@ class UserController extends Controller
     {
 
             $request->validate(['email' => 'required|email']);
-        if (!$this->deactivated()) {
+
 
             $status = Password::sendResetLink(
                 $request->only('email')
@@ -295,8 +308,7 @@ class UserController extends Controller
             return $status === Password::RESET_LINK_SENT
                 ? response(['status' => __($status)])
                 : response(['email' => __($status)]);
-        }
-        else{return response("Your account is deactivated");}
+
     }
 
     public function resetToken(string $token)
@@ -361,7 +373,7 @@ class UserController extends Controller
     {
         $users = Department::find($department->id)->users()->paginate(10);
 
-        // Kontrola, či používateľ nie je admin, ak nie je, získa iba nezmazaných používateľov
+
         if (auth()->user()->role->role !== "Admin") {
             $users->whereNull('deleted_at');
         }
@@ -376,7 +388,7 @@ class UserController extends Controller
         $user->save();
         return response()->json(['message' => 'Úspešne deaktivovaný']);
     }
-    public function activate(User $user){
+    public function restore(User $user){
         $user->restore();
         return response()->json(['message' => 'Úspešne reaktovovaný']);
     }
@@ -407,7 +419,6 @@ class UserController extends Controller
 
     public function show(User $user)
     {
-        // Kontrola, či používateľ nie je admin a záznam nie je soft deleted
         if (auth()->user()->role->role !== "Admin" && $user->trashed()) {
             return response("User thrashed", 403);
         }
@@ -437,26 +448,25 @@ class UserController extends Controller
         return response()->json($result);
     }
 
-    public function deactivated(User $user)
-    {
-        return $user->trashed() ? 'true' : 'false';
-    }
 
     public function update(Request $request, User $user)
     {
+        $fields = $request->all();
         if (isset($fields['role_id'])) {
             return response('Cannot change role', 400);
         }
-        $fields = $request->all();
+
         $userRole = $user->role->role;
-        if (auth()->user()->id === $user->id) {
+        if (auth()->user()->id === $user->id && auth()-user()->role !=="Admin") {
             $validate = $request->validate([
                 'first_name' => 'string',
                 'last_name' => 'string',
                 'email' => 'email',
             ]);
-            if ($validate['email']!==null) {
+            if (isset($validate['email'])){
+                if ($validate['email']!==auth()->user()->email) {
                 //verification
+                }
             }
             $user->fill($validate);
             $user->save();
@@ -491,17 +501,17 @@ class UserController extends Controller
     }
 
 
-    public function updateUser($user,$fields,$userRole)
+    private function updateUser($user,$fields,$userRole)
     {
         $user->fill($fields);
         $user->save();
         if (($fields['company_id'] || $fields['phone']) && $userRole === "Zástupca firmy") {
-            $companyEmployee = CompanyEmployee::where('user_id',$user->id);
+            $companyEmployee = CompanyEmployee::where('user_id',$user->id)->get();
             $companyEmployee->fill($fields);
             $companyEmployee->save();
         }
         if($userRole==="Poverený pracovník pracoviska" ||$userRole==="Vedúci pracoviska"){
-            $departmentEmployee=DepartmentEmployee::where('user_id',$user->id)->where('to',null);
+            $departmentEmployee=DepartmentEmployee::where('user_id',$user->id)->where('to',null)->get();
             if($fields["department_id"]){
                 $departmentEmployee->to=now();
                 $departmentEmployee->save();
