@@ -9,6 +9,7 @@ use App\Models\PracticeRecord;
 use App\Models\PracticeStatus;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
 
 class PracticeController extends Controller
@@ -164,6 +165,47 @@ class PracticeController extends Controller
         $practices = Practice::where('program_id', $program->id)->latest()->paginate(10);
 
         return response($practices);
+    }
+
+    public function generateCompletionConfirmation(Practice $practice) {
+        if($practice->completion_confirmation) {
+            return Storage::download('completionConfirmations/'.$practice->completion_confirmation);
+        }
+        $pdf = PDF::loadView('practiceConfirmation', 
+        [
+            'practiceRecords' => $practice->practiceRecords, 
+            'practice' => $practice,
+            'company' => $practice->company,
+            'companyEmployee' => $practice->companyEmployee,
+            'user' => $practice->user,
+            'program' => $practice->program
+        ]);
+        $content = $pdf->download()->getOriginalContent();
+        Storage::put("completionConfirmations/completionConfirmation".$practice->id.".pdf",$content);         //ubuntu cmd: sudo chmod -R 777 storage
+        $practice->completion_confirmation = "completionConfirmation".$practice->id.".pdf";
+
+        $practice->save();
+ 
+        return Storage::download('completionConfirmations/'.$practice->completion_confirmation);
+    }
+
+    public function regenerateCompletionConfirmation(Practice $practice) {
+        $pdf = PDF::loadView('practiceConfirmation', 
+        [
+            'practiceRecords' => $practice->practiceRecords, 
+            'practice' => $practice,
+            'company' => $practice->company,
+            'companyEmployee' => $practice->companyEmployee,
+            'user' => $practice->user,
+            'program' => $practice->program
+        ]);
+        $content = $pdf->download()->getOriginalContent();
+        Storage::put("completionConfirmations/completionConfirmation".$practice->id.".pdf",$content);         //ubuntu cmd: sudo chmod -R 777 storage
+        $practice->completion_confirmation = "completionConfirmation".$practice->id.".pdf";
+
+        $practice->save();
+ 
+        return Storage::download('completionConfirmations/'.$practice->completion_confirmation);
     }
 
 
