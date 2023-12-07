@@ -78,7 +78,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(CompanyEmployee::class);
     }
-    
+
     public function departmentEmployee() :HasOne
     {
         return $this->hasOne(DepartmentEmployee::class);
@@ -91,4 +91,5 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(feedback::class);
     }
+
 }

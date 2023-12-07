@@ -55,4 +55,9 @@ class Practice extends Model
     {
         return $this->hasMany(Comment::class);
     }
+
+    public function evaluation() :HasMany
+    {
+        return $this->hasMany(Evaluation::class);
+    }
 }

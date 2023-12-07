@@ -193,6 +193,7 @@ class UserController extends Controller {
                         "manage-feedback",
                         "admin-feedback",
                         "read-feedback",
+                        "manage-evaluation",
                     ]
                 )->plainTextToken;
                 break;
@@ -213,6 +214,7 @@ class UserController extends Controller {
                         "filter-practices",
                         "manage-feedback",
                         "read-feedback",
+                        "manage-evaluation",
                     ]
                 )->plainTextToken;
                 break;
@@ -232,6 +234,7 @@ class UserController extends Controller {
                         "filter-practices",
                         "manage-feedback",
                         "read-feedback",
+                        "manage-evaluation",
                     ]
                 )->plainTextToken;
                 break;
