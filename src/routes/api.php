@@ -1,14 +1,20 @@
 <?php
 
-use App\Http\Controllers\CommentController;
+use App\Models\Program;
+use App\Models\Department;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\MajorController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\CompanyController;
+use App\Http\Controllers\FacultyController;
+use App\Http\Controllers\ProgramController;
 use App\Http\Controllers\FeedbackController;
 use App\Http\Controllers\PracticeController;
+use App\Http\Controllers\DepartmentController;
+use App\Http\Controllers\PracticeOffersController;
 use App\Http\Controllers\PracticeRecordsController;
 use App\Http\Controllers\CompanyDepartmentController;
-use App\Http\Controllers\PracticeOffersController;
 use App\Http\Controllers\EmailVerificationController;
 
 /*
@@ -175,10 +181,42 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
                 Route::get('/feedback/{feedback}', [FeedbackController::class, "show"]);
             });
-
-
-
-
+            Route::group(['middleware' => ["ability:manage-faculties"]], function () {
+                Route::get("/faculties/{faculty}", [FacultyController::class, "store"]);
+                Route::delete('/faculties/{faculty}', [FacultyController::class, "destroy"]);  
+                Route::put('/faculties/{faculty}', [FacultyController::class, 'update']);
+            });
+            Route::group(['middleware' => ["ability:read-faculties"]], function () {
+                Route::get('/faculties', [FacultyController::class, 'index']);
+                Route::get('/faculties/{faculty}', [FacultyController::class, "show"]);
+            });
+            Route::group(['middleware' => ["ability:manage-departments"]], function () {
+                Route::get("/departments{department}", [DepartmentController::class, "store"]);
+                Route::delete('/departments{department}', [DepartmentController::class, "destroy"]);  
+                Route::put('/departments{department}', [DepartmentController::class, 'update']);
+            });
+            Route::group(['middleware' => ["ability:read-departments"]], function () {
+                Route::get('/departments', [DepartmentController::class, 'index']);
+                Route::get('/departments{department}', [DepartmentController::class, "show"]);
+            });
+            Route::group(['middleware' => ["ability:manage-majors"]], function () {
+                Route::get("/majors{major}", [MajorController::class, "store"]);
+                Route::delete('/majors{major}', [MajorController::class, "destroy"]);  
+                Route::put('/majors{major}', [MajorController::class, 'update']);
+            });
+            Route::group(['middleware' => ["ability:read-majors"]], function () {
+                Route::get('/majors', [MajorController::class, 'index']);
+                Route::get('/majors{major}', [MajorController::class, "show"]);
+            });
+            Route::group(['middleware' => ["ability:manage-programs"]], function () {
+                Route::get("/programs{program}", [ProgramController::class, "store"]);
+                Route::delete('/programs{program}', [ProgramController::class, "destroy"]);  
+                Route::put('/programs{program}', [ProgramController::class, 'update']);
+            });
+            Route::group(['middleware' => ["ability:read-programs"]], function () {
+                Route::get('/programs', [ProgramController::class, 'index']);
+                Route::get('/programs{program}', [ProgramController::class, "show"]);
+            });
     });
         
 
