@@ -22,12 +22,7 @@ class UserController extends Controller
 {
     public function index()
     {
-        if (auth()->user()->role->role !== "Admin") {
             $users = User::paginate(20);
-        }else{
-            $users = User::withTrashed()->paginate(20);
-        }
-
 
         return response([
             'items' => $users->items(),
