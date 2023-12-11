@@ -29,7 +29,7 @@ class DepartmentController extends Controller
             'short' => 'required|string',
             'faculty_id' => 'required|exists:faculties,id',
         ]);
-        $department= Department::create($request->all());
+        $department= Department::create($validatedData);
 
         return response()->json($department);
     }

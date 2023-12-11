@@ -28,7 +28,7 @@ class FacultyController extends Controller
             'name' => 'required|string',
             'short' => 'required|string',
         ]);
-        $faculty= Faculty::create($request->all());
+        $faculty= Faculty::create($validatedData);
 
         return response()->json($faculty);
     }

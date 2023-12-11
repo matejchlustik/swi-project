@@ -181,42 +181,33 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
                 Route::get('/feedback/{feedback}', [FeedbackController::class, "show"]);
             });
-            Route::group(['middleware' => ["ability:manage-faculties"]], function () {
-                Route::get("/faculties/{faculty}", [FacultyController::class, "store"]);
+
+            Route::group(['middleware' => ["ability:manage-workplaces"]], function () {
+                Route::post("/faculties", [FacultyController::class, "store"]);
                 Route::delete('/faculties/{faculty}', [FacultyController::class, "destroy"]);  
                 Route::put('/faculties/{faculty}', [FacultyController::class, 'update']);
+                Route::post("/departments", [DepartmentController::class, "store"]);
+                Route::delete('/departments/{department}', [DepartmentController::class, "destroy"]);  
+                Route::put('/departments/{department}', [DepartmentController::class, 'update']);
+                Route::post("/majors", [MajorController::class, "store"]);
+                Route::delete('/majors/{major}', [MajorController::class, "destroy"]);  
+                Route::put('/majors/{major}', [MajorController::class, 'update']);
+                Route::post("/programs", [ProgramController::class, "store"]);
+                Route::delete('/programs/{program}', [ProgramController::class, "destroy"]);  
+                Route::put('/programs/{program}', [ProgramController::class, 'update']);
             });
-            Route::group(['middleware' => ["ability:read-faculties"]], function () {
+            
+            Route::group(['middleware' => ["ability:read-workplaces"]], function () {
                 Route::get('/faculties', [FacultyController::class, 'index']);
                 Route::get('/faculties/{faculty}', [FacultyController::class, "show"]);
-            });
-            Route::group(['middleware' => ["ability:manage-departments"]], function () {
-                Route::get("/departments{department}", [DepartmentController::class, "store"]);
-                Route::delete('/departments{department}', [DepartmentController::class, "destroy"]);  
-                Route::put('/departments{department}', [DepartmentController::class, 'update']);
-            });
-            Route::group(['middleware' => ["ability:read-departments"]], function () {
                 Route::get('/departments', [DepartmentController::class, 'index']);
-                Route::get('/departments{department}', [DepartmentController::class, "show"]);
-            });
-            Route::group(['middleware' => ["ability:manage-majors"]], function () {
-                Route::get("/majors{major}", [MajorController::class, "store"]);
-                Route::delete('/majors{major}', [MajorController::class, "destroy"]);  
-                Route::put('/majors{major}', [MajorController::class, 'update']);
-            });
-            Route::group(['middleware' => ["ability:read-majors"]], function () {
+                Route::get('/departments/{department}', [DepartmentController::class, "show"]);
                 Route::get('/majors', [MajorController::class, 'index']);
-                Route::get('/majors{major}', [MajorController::class, "show"]);
-            });
-            Route::group(['middleware' => ["ability:manage-programs"]], function () {
-                Route::get("/programs{program}", [ProgramController::class, "store"]);
-                Route::delete('/programs{program}', [ProgramController::class, "destroy"]);  
-                Route::put('/programs{program}', [ProgramController::class, 'update']);
-            });
-            Route::group(['middleware' => ["ability:read-programs"]], function () {
+                Route::get('/majors/{major}', [MajorController::class, "show"]);
                 Route::get('/programs', [ProgramController::class, 'index']);
-                Route::get('/programs{program}', [ProgramController::class, "show"]);
+                Route::get('/programs/{program}', [ProgramController::class, "show"]);
             });
+
     });
         
 

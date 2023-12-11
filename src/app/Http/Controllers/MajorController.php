@@ -29,7 +29,7 @@ class MajorController extends Controller
             'short' => 'required|string',
             'department_id' => 'required|exists:departments,id',
         ]);
-        $major= Major::create($request->all());
+        $major= Major::create($validatedData);
 
         return response()->json($major);
     }

@@ -27,9 +27,9 @@ class ProgramController extends Controller
         $validatedData = $request->validate([
             'name' => 'required|string',
             'short' => 'required|string',
-            'major_id' => 'required|exists:major,id',
+            'major_id' => 'required|exists:majors,id',
         ]);
-        $program= Program::create($request->all());
+        $program= Program::create($validatedData);
 
         return response()->json($program);
     }

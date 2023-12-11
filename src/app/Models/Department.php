@@ -18,6 +18,8 @@ class Department extends Model
         'faculty_id'
     ];
 
+    public $timestamps = false;
+
     public function faculty() :BelongsTo
     {
         return $this->belongsTo(Faculty::class);

@@ -10,6 +10,13 @@ class Faculty extends Model
 {
     use HasFactory;
 
+    protected $fillable = [
+        'name',
+        'short',
+    ];
+
+    public $timestamps = false;
+
     public function department() :HasMany
     {
         return $this->hasMany(Department::class);

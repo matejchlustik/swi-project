@@ -193,14 +193,8 @@ class UserController extends Controller {
                         "manage-feedback",
                         "admin-feedback",
                         "read-feedback",
-                        "manage-faculties",
-                        "read-faculties",
-                        "manage-departments",
-                        "read-departments",
-                        "manage-majors",
-                        "read-majors",
-                        "manage-programs",
-                        "read-programs",
+                        "manage-workplaces",
+                        "read-workplaces",
                     ]
                 )->plainTextToken;
                 break;
@@ -221,14 +215,8 @@ class UserController extends Controller {
                         "filter-practices",
                         "manage-feedback",
                         "read-feedback",
-                        "manage-faculties",
-                        "read-faculties",
-                        "manage-departments",
-                        "read-departments",
-                        "manage-majors",
-                        "read-majors",
-                        "manage-programs",
-                        "read-programs",
+                        "manage-workplaces",
+                        "read-workplaces",
                     ]
                 )->plainTextToken;
                 break;
@@ -249,13 +237,8 @@ class UserController extends Controller {
                         "manage-feedback",
                         "read-feedback",
                         "manage-faculties",
-                        "read-faculties",
-                        "manage-departments",
-                        "read-departments",
-                        "manage-majors",
-                        "read-majors",
-                        "manage-programs",
-                        "read-programs",
+                        "manage-workplaces",
+                        "read-workplaces",
                     ]
                 )->plainTextToken;
                 break;
@@ -268,10 +251,7 @@ class UserController extends Controller {
                         "edit-company",
                         "manage-feedback",
                         "read-feedback",
-                        "read-faculties",
-                        "read-departments",
-                        "read-majors",
-                        "read-programs",
+                        "read-workplaces",
                     ]
                 )->plainTextToken;
                 break;
@@ -283,10 +263,7 @@ class UserController extends Controller {
                         "manage-comments",
                         "manage-feedback",
                         "read-feedback",
-                        "read-faculties",
-                        "read-departments",
-                        "read-majors",
-                        "read-programs",
+                        "read-workplaces",
                     ]
                 )->plainTextToken;
                 break;
