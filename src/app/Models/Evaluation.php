@@ -8,6 +8,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class Evaluation extends Model
 {
+    protected $fillable = [
+        'practice_id',
+        'department_employee_id',
+        'evaluation'
+    ];
+
     public function departmentEmployee() :BelongsTo
     {
         return $this->belongsTo(DepartmentEmployee::class);

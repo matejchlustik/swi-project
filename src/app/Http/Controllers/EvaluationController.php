@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\Models\DepartmentEmployee;
 use App\Models\Evaluation;
 use App\Models\Practice;
-use App\Models\User;
 use Illuminate\Http\Request;
 
 class EvaluationController extends Controller
@@ -38,15 +37,37 @@ class EvaluationController extends Controller
         return response($evaluation);
     }
 
-    public function update(Practice $practice)
+    public function update(Evaluation $evaluation, Request $request)
     {
+        $validated = $request->validate([
+            'evaluation' => 'required|integer|between:0,100',
+        ]);
 
+        $evaluation->fill($validated);
+        $evaluation->save();
+
+        return response()->json($evaluation);
     }
 
-    public function show(Practice $practice)
+    public function show(Evaluation $evaluation)
     {
-
+        return response()->json($evaluation->load(["practice","departmentEmployee.user"]));
     }
 
+    public function destroy(Evaluation $evaluation)
+    {
+        if (auth()->user()->role->role !== "Admin") {
+            $DepartmentEmployee = DepartmentEmployee::where('user_id',auth()->id())->first();
+            if ($DepartmentEmployee->id === $evaluation->department_employee_id) {
+                $evaluation->delete();
+            }else{
+                return response ("Forbidden", 403);
+            }
+        }else{
+            $evaluation->delete();
+        }
+
+        return response()->json(['message' => 'Feedback deleted successfully.']);
+    }
 
 }
