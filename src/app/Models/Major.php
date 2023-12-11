@@ -15,6 +15,8 @@ class Major extends Model
         'department_id'
     ];
 
+    public $timestamps = false;
+
     public function department() :BelongsTo
     {
         return $this->belongsTo(Department::class);

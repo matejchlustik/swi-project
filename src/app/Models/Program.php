@@ -14,6 +14,9 @@ class Program extends Model
         'short',
         'major_id'
     ];
+
+    public $timestamps = false;
+    
     public function major() :BelongsTo
     {
         return $this->belongsTo(Majors::class);
