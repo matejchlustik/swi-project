@@ -49,7 +49,7 @@ class Practice extends Model
     }
     public function feedback() :HasMany
     {
-        return $this->hasMany(feedback::class);
+        return $this->hasMany(Feedback::class);
     }
     public function comments() :HasMany
     {

@@ -33,6 +33,16 @@ class EvaluationController extends Controller
 
     public function index(Practice $practice)
     {
+        if(auth()->user()->role->role === "Študent") {
+            if($practice->user_id != auth()->id()) {
+                return response ("Forbidden", 403);
+            } 
+        }
+
+        if(auth()->user()->role->role === "Zástupca firmy") {
+                return response ("Forbidden", 403);
+        }
+
         return response($practice->evaluations->load(["departmentEmployee.user"]));
     }
 
@@ -46,11 +56,6 @@ class EvaluationController extends Controller
         $evaluation->save();
 
         return response()->json($evaluation);
-    }
-
-    public function show(Evaluation $evaluation)
-    {
-        return response()->json($evaluation->load(["practice","departmentEmployee.user"]));
     }
 
     public function destroy(Evaluation $evaluation)

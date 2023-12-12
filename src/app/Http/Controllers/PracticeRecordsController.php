@@ -9,14 +9,14 @@ use Illuminate\Http\Request;
 class PracticeRecordsController extends Controller
 {
 
-    public function store(Request $request)
+    public function store(Request $request, Practice $practice)
     {
         $newRecord = new PracticeRecord();
         $newRecord->from = $request->input('from');
         $newRecord->to = $request->input('to');
         $newRecord->description = $request->input('description');
         $newRecord->hours = $request->input('hours');
-        $newRecord->practice_id = $request->input('practice_id');
+        $newRecord->practice_id = $practice->id;
 
         $newRecord->save();
 
@@ -38,15 +38,7 @@ class PracticeRecordsController extends Controller
             } 
         }
 
-        $practiceRecords = PracticeRecord::where('practice_id', $practice->id)->paginate(10);
-
-        return response([
-            'items' => $practiceRecords->items(),
-            'prev_page_url' =>$practiceRecords->previousPageUrl(),
-            'next_page_url' => $practiceRecords->nextPageUrl(),
-            'last_page' =>$practiceRecords->lastPage(),
-            'total' => $practiceRecords->total()
-        ]);
+        return response($practice->practiceRecords);
     }
 
     public function update(PracticeRecord $practiceRecord, Request $request)
