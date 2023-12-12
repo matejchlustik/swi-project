@@ -66,7 +66,7 @@ class EvaluationController extends Controller
             $evaluation->delete();
         }
 
-        return response()->json(['message' => 'Feedback deleted successfully.']);
+        return response()->json(['message' => 'Evaluation deleted successfully.']);
     }
 
 }
