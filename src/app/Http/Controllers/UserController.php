@@ -195,6 +195,7 @@ class UserController extends Controller {
                         "read-feedback",
                         "manage-workplaces",
                         "read-workplaces",
+                        "manage-evaluation",
                     ]
                 )->plainTextToken;
                 break;
@@ -217,6 +218,7 @@ class UserController extends Controller {
                         "read-feedback",
                         "manage-workplaces",
                         "read-workplaces",
+                        "manage-evaluation",
                     ]
                 )->plainTextToken;
                 break;
@@ -239,6 +241,7 @@ class UserController extends Controller {
                         "manage-faculties",
                         "manage-workplaces",
                         "read-workplaces",
+                        "manage-evaluation",
                     ]
                 )->plainTextToken;
                 break;
