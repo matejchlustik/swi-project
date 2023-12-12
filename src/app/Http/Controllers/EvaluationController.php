@@ -33,6 +33,16 @@ class EvaluationController extends Controller
 
     public function index(Practice $practice)
     {
+        if(auth()->user()->role->role === "Študent") {
+            if($practice->user_id != auth()->id()) {
+                return response ("Forbidden", 403);
+            } 
+        }
+
+        if(auth()->user()->role->role === "Zástupca firmy") {
+                return response ("Forbidden", 403);
+        }
+
         return response($practice->evaluations->load(["departmentEmployee.user"]));
     }
 

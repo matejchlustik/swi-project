@@ -9,32 +9,28 @@ use Illuminate\Http\Request;
 
 class CommentController extends Controller
 {
-    public function index()
+    public function index(Practice $practice)
     {
-        $comments = Comment::paginate(20);
+        if(auth()->user()->role->role === "Študent") {
+            if($practice->user_id != auth()->id()) {
+                return response ("Forbidden", 403);
+            } 
+        }
 
-        return response([
-            'items' => $comments->items(),
-            'prev_page_url' =>$comments->previousPageUrl(),
-            'next_page_url' => $comments->nextPageUrl(),
-            'last_page' =>$comments->lastPage(),
-            'total' => $comments->total()
-        ]);
-    }
-    public function getCommentsByPracticeId(Practice $practice)
-    {
-        $comments = Comment::where("practice_id", $practice->id)->get();
+        if(auth()->user()->role->role === "Zástupca firmy") {
+                return response ("Forbidden", 403);
+        }
 
-        return response($comments);
+        return response($practice->comments->load(["user"]));
     }
 
-    public function store(Request $request)
+
+    public function store(Request $request, Practice $practice)
     {
             $validatedData = $request->validate([
                 'body' => 'required',
-                'practice_id' => 'required|exists:practices,id',
             ]);
-            $comment = Comment::create([...$validatedData, 'user_id' => auth()->user()->id]);
+            $comment = Comment::create([...$validatedData, 'user_id' => auth()->user()->id, 'practice_id' => $practice->id]);
             return response()->json($comment);
     }
 
@@ -53,12 +49,7 @@ class CommentController extends Controller
 
             return response()->json($comment);
     }
-    public function getCommentsByUserId(User $user)
-    {
-        $comments = Comment::where('user_id', $user->id)->get();
 
-        return response($comments);
-    }
     public function destroy(Comment $comment)
     {
         if (auth()->user()->role->role !== "Admin") {
