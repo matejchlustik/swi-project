@@ -25,16 +25,15 @@ class EvaluationController extends Controller
                 $newEvaluation->evaluation = $validated['evaluation'];
                 $newEvaluation->save();
 
-                $evaluation = Evaluation::find($newEvaluation->id)->load(["practice","departmentEmployee.user"]);
+                $evaluation = Evaluation::find($newEvaluation->id);
                 return response($evaluation);
             }else
                 return response('Evaluation already exists');
     }
 
-    public function index()
+    public function index(Practice $practice)
     {
-        $evaluation = Evaluation::get()->load(["practice","departmentEmployee.user"]);
-        return response($evaluation);
+        return response($practice->evaluations->load(["departmentEmployee.user"]));
     }
 
     public function update(Evaluation $evaluation, Request $request)
