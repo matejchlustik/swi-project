@@ -157,7 +157,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::group(['middleware' => ["ability:manage-evaluation"]], function () {
                 Route::post('/practices/{practice}/evaluations', [EvaluationController::class, 'store']);
                 Route::put('/evaluations/{evaluation}', [EvaluationController::class, 'update']);
-                Route::get('/evaluations/{evaluation}', [EvaluationController::class, 'show']);
                 Route::delete('/evaluations/{evaluation}', [EvaluationController::class, 'destroy']);
             });
 

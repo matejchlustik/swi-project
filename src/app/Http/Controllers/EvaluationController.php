@@ -58,11 +58,6 @@ class EvaluationController extends Controller
         return response()->json($evaluation);
     }
 
-    public function show(Evaluation $evaluation)
-    {
-        return response()->json($evaluation->load(["practice","departmentEmployee.user"]));
-    }
-
     public function destroy(Evaluation $evaluation)
     {
         if (auth()->user()->role->role !== "Admin") {
