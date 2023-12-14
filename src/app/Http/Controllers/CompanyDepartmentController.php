@@ -18,6 +18,10 @@ class CompanyDepartmentController extends Controller
     
     public function update(Request $request, CompanyDepartment $companyDepartment)
     {
+        $validatedData = $request->validate([
+            'department_id' => 'exists:department,id',
+            'company_id' => 'exists:company,id',
+        ]);
         $companyDepartment->fill($request->all());
         $companyDepartment->save();
 
