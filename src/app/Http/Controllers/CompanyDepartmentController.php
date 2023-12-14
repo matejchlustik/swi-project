@@ -25,6 +25,10 @@ class CompanyDepartmentController extends Controller
     }
 
     public function store(Request $request) {
+        $validatedData = $request->validate([
+            'department_id' => 'required|exists:department,id',
+            'company_id' => 'required|exists:company,id',
+        ]);
 
         $companyDepartment = Companydepartment::create($request->all());
 

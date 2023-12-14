@@ -28,7 +28,9 @@ class CommentController extends Controller
     public function store(Request $request, Practice $practice)
     {
             $validatedData = $request->validate([
-                'body' => 'required',
+                'body' => 'required|text',
+                'practice_id' => 'required|exists:practice,id',
+                'user_id' => 'required|exists:user,id',
             ]);
             $comment = Comment::create([...$validatedData, 'user_id' => auth()->user()->id, 'practice_id' => $practice->id]);
             return response()->json($comment);
@@ -42,7 +44,7 @@ class CommentController extends Controller
             }
         }
         $validatedData = $request->validate([
-            'body' => 'required',
+            'body' => 'required|text',
         ]);
             $comment->fill($validatedData);
             $comment->save();

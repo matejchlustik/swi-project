@@ -32,8 +32,8 @@ class PracticeOffersController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'description' => 'required',
-            'phone' => 'required',
+            'description' => 'required|text',
+            'phone' => 'required|string',
             'email' => 'required|email',
             'company_department_id' => 'required|exists:company_department,id'
         ]);
@@ -60,6 +60,11 @@ class PracticeOffersController extends Controller
                 return response("Forbidden", 403);
             }
         }
+        $validatedData = $request->validate([
+            'description' => 'text',
+            'phone' => 'string',
+            'email' => 'email',
+        ]);
 
         $practiceOffer->fill($request->all());
         $practiceOffer->save();
