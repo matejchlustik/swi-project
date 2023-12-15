@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('short');
-            $table->foreignId('major_id')->constrained();
+            $table->foreignId('major_id')->constrained()->onDelete("cascade");
         });
     }
 

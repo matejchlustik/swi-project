@@ -13,8 +13,10 @@ return new class extends Migration
     {
         Schema::create('department_employees', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('user_id')->constrained()->onDelete("cascade");
             $table->foreignId('department_id')->constrained();
+            $table->date('from');
+            $table->date('to')->nullable()->default(null);
         });
     }
 
@@ -25,4 +27,5 @@ return new class extends Migration
     {
         Schema::dropIfExists('department_employees');
     }
+
 };

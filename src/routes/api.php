@@ -68,6 +68,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::get("/practice_offers/companies/{company}", [PracticeOffersController::class, "showByCompany"]);
 
             Route::group(['middleware' => ["ability:manage-company-department"]], function () {
+                
                 Route::get("/company_department", [CompanyDepartmentController::class, "index"]);
                 Route::post("/company_department", [CompanyDepartmentController::class, "store"]);
                 Route::get("/company_department/{companyDepartment}", [CompanyDepartmentController::class, "show"]);
@@ -93,6 +94,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
                 Route::get('practices/{practice}/practice_records', [PracticeRecordsController::class, "index"]);
                 Route::get('/practices/{practice}/feedback', [FeedbackController::class, 'index']);
                 Route::get('/practices', [PracticeController::class, "index"]);
+    
                 Route::get('/practices/{practice}', [PracticeController::class, "show"]);
             });
 
@@ -159,6 +161,16 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
                 Route::put('/evaluations/{evaluation}', [EvaluationController::class, 'update']);
                 Route::delete('/evaluations/{evaluation}', [EvaluationController::class, 'destroy']);
             });
+
+            Route::group(['middleware' => ["ability:manage-users"]], function () {
+                Route::get("/users", [UserController::class, "index"])->withTrashed();;
+                Route::get("/users/role/{role}", [UserController::class, "showByRole"])->withTrashed();
+                Route::get("/users/{user}", [UserController::class, "show"])->withTrashed();
+                Route::delete('/users/{user}', [UserController::class, "deactivate"]);
+                Route::get("/users/departments/{department}", [UserController::class, "showByDepartment"])->withTrashed();
+            });
+        
+            Route::put('/users/{user}', [UserController::class, "update"]);
 
     });
 
