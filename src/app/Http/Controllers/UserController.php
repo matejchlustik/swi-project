@@ -416,8 +416,8 @@ class UserController extends Controller
             $validate = $request->validate([
                 'first_name' => 'string',
                 'last_name' => 'string',
-                'email' => 'email',
-                'phone' => 'number',
+                'email' => 'email|unique:users,email',
+                'phone' => 'string',
                 'company_id' => 'integer|exists:companies,id',
                 'department_id' => 'integer|exists:departments,id'
             ]);
