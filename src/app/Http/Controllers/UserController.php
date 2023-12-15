@@ -390,26 +390,10 @@ class UserController extends Controller
 
     public function destroy(User $user)
     {
-        $practices = Practice::where('user_id', $user->id)->get();
-        if ($practices->isEmpty()) {
-            $departmentEmployees = DepartmentEmployee::where('user_id', $user->id)->get();
-            $companyEmployees = CompanyEmployee::where('user_id', $user->id)->get();
-            if ($departmentEmployees->isEmpty() && $companyEmployees->isEmpty()) {
                 $user->forceDelete();
-
                 return response()->json([
                     'message' => 'Používateľ bol úspešne odstránený.',
                 ]);
-            } else {
-                return response()->json([
-                    'message' => 'Používateľ nie je možné odstrániť, pretože je priradený k pracoviskám alebo spoločnostiam.',
-                ], 422);
-            }
-        } else {
-            return response()->json([
-                'message' => 'Používateľ nie je možné odstrániť, pretože je priradený k praxiam.',
-            ], 422);
-        }
     }
 
     public function show(User $user)
@@ -423,15 +407,9 @@ class UserController extends Controller
 
     public function showByRole(Request $request)
     {
-        $roles = $request->query('role_id');
+        $users = User::whereHas('role_id'==$request["role_id"]);
 
-        $users = User::query();
 
-        if ($roles) {
-            $users->whereHas('role_id', function ($query) use ($roles) {
-                $query->whereIn('role.id', $roles);
-            });
-        }
 
         // Kontrola, či používateľ nie je admin, ak nie je, získa iba nezmazaných používateľov
         if (auth()->user()->role->role !== "Admin") {
@@ -447,50 +425,32 @@ class UserController extends Controller
     public function update(Request $request, User $user)
     {
         $fields = $request->all();
-        if (isset($fields['role_id'])) {
-            return response('Cannot change role', 400);
-        }
 
         $userRole = $user->role->role;
-        if (auth()->user()->id === $user->id && auth()-user()->role !=="Admin") {
-            $validate = $request->validate([
-                'first_name' => 'string',
-                'last_name' => 'string',
-                'email' => 'email',
-            ]);
-            if (isset($validate['email'])){
-                if ($validate['email']!==auth()->user()->email) {
-                //verification
-                }
+        if (auth()->user()->id === $user->id && auth()-user()->role->role !=="Admin") {
+            if (isset($fields['role_id'])){
+                return response('Cannot change role', 400);
             }
-            $user->fill($validate);
-            $user->save();
+            else {
+                $validate = $request->validate([
+                    'first_name' => 'string',
+                    'last_name' => 'string',
+                    'email' => 'email',
+                ]);
+                $user->fill($validate);
+                $user->save();
 
-            return response('User updated');
+                return response('User updated');
+            }
         }
 
-        if (auth()->user()->tokenCan("manage-users")) {
-            $this->updateUser($user, $fields, $userRole);
-            return response('User updated');
-        }
-        if (auth()->user()->tokenCan("manage-wo-admin")) {
-            if ($userRole === "Admin" || $userRole === "Vedúci pracoviska") {return response("You can't update admin or department head ",403);}
+        if (auth()->user()->role->role=="Admin") {
+            if ( (isset($fields['role_id'])==2 && $user->role_id==3) || ($user->role_id==2 && isset($fields['role_id'])==3)) {
 
-                if ($userRole === "Poverený pracovník pracoviska"){
-                    if ($user->department->id === auth()->user()->department->id){
-                        $this->updateUser($user, $fields, $userRole);
-                        return response('User updated');
-                    } else {return response("You can't update someone out of your department ",403);}
-                }
-            else {$this->updateUser($user, $fields, $userRole);return response('User updated');}
-        }
-        if (auth()->user()->tokenCan("manage-wo-admin-wo-dephead")) {
-
-            if ($userRole === "Admin" || $userRole === "Vedúci pracoviska" || $userRole === "Poverený pracovník pracoviska") {
-                return response("You can't update admin or department head ", 403);
-            } else {
                 $this->updateUser($user, $fields, $userRole);
                 return response('User updated');
+            }else{
+                return response('Cannot change role', 400);
             }
         }
     }

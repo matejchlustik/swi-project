@@ -131,7 +131,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
         Route::get("/users/soft_deleted", [UserController::class, "indexDeleted"]);
 
-        Route::delete('/users/{user}', [UserController::class, "destroy"]);
+        Route::delete('/users/{user}/force-delete', [UserController::class, "destroy"]);
 
         Route::post('/users', [UserController::class, "store"]);
 
@@ -142,7 +142,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
         Route::get("/users/role", [UserController::class, "showByRole"]);
 
-        Route::get("/users/{user}", [UserController::class, "show"]);
+        Route::get("/users/{user}", [UserController::class, "show"])->withTrashed();
 
         Route::delete('/users/{user}', [UserController::class, "deactivate"]);
 
