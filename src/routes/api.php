@@ -137,22 +137,19 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
         Route::post('/users/{user}/restore', [UserController::class, "restore"])->withTrashed();
     });
-    Route::group(['middleware' => ["ability:manage-users-other"]], function () {
-        Route::get("/users", [UserController::class, "index"]);
 
-        Route::get("/users/role/{role}", [UserController::class, "showByRole"]);
+    Route::group(['middleware' => ["ability:manage-users"]], function () {
+        Route::get("/users", [UserController::class, "index"])->withTrashed();;
+
+        Route::get("/users/role/{role}", [UserController::class, "showByRole"])->withTrashed();
 
         Route::get("/users/{user}", [UserController::class, "show"])->withTrashed();
 
         Route::delete('/users/{user}', [UserController::class, "deactivate"]);
 
-        Route::get("/users/departments/{department}", [UserController::class, "showByDepartment"]);
-
+        Route::get("/users/departments/{department}", [UserController::class, "showByDepartment"])->withTrashed();
     });
 
     Route::put('/users/{user}', [UserController::class, "update"]);
 
-    Route::group(['middleware' => ["ability:manage-wo-admin-wo-dephead"]], function () {
-
-    });
 });

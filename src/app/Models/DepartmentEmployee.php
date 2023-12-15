@@ -14,6 +14,8 @@ class DepartmentEmployee extends Model
     protected $fillable = [
         'user_id',
         'department_id',
+        "from",
+        "to",
     ];
 
     public $timestamps = false;

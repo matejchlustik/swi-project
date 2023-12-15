@@ -206,7 +206,6 @@ class UserController extends Controller
                             "manage-company",
                             "edit-company",
                             "manage-company",
-                            "manage-users-other",
                             "manage-users"
                         ]
                     )->plainTextToken;
@@ -225,8 +224,6 @@ class UserController extends Controller
                             "read-company",
                             "manage-company",
                             "edit-company",
-                            "manage-users-other",
-                            "manage-wo-admin"
                         ]
                     )->plainTextToken;
                     break;
@@ -243,8 +240,6 @@ class UserController extends Controller
                             "read-company",
                             "manage-company",
                             "edit-company",
-                            "manage-users-other",
-                            "manage-wo-admin-wo-dephead"
                         ]
                     )->plainTextToken;
                     break;
@@ -407,17 +402,7 @@ class UserController extends Controller
 
     public function showByRole(Role $role)
     {
-
-
-
-        // Kontrola, či používateľ nie je admin, ak nie je, získa iba nezmazaných používateľov
-        if (auth()->user()->role->role !== "Admin") {
-            $users = User::whereNull()->where('role_id',$role->id)->get();
-        }else{$users = User::where('role_id',$role->id)->get();}
-
-        $result = $users->get();
-
-        return response()->json($result);
+        return response()->json($role->users);
     }
 
 
@@ -426,7 +411,30 @@ class UserController extends Controller
         $fields = $request->all();
 
         $userRole = $user->role->role;
-        if (auth()->user()->id === $user->id && auth()-user()->role->role !=="Admin") {
+
+        if (auth()->user()->role->role=="Admin") {
+            $validate = $request->validate([
+                'first_name' => 'string',
+                'last_name' => 'string',
+                'email' => 'email',
+                'phone' => 'number',
+                'company_id' => 'integer|exists:companies,id',
+                'department_id' => 'integer|exists:departments,id'
+            ]);
+            if ((isset($fields['role_id'])==2 && $user->role_id==3) || ($user->role_id==2 && isset($fields['role_id'])==3)) {
+                $this->updateUser($user, $validate, $userRole);
+                return response($user);
+            }else{
+                if (isset($fields['role_id'])){
+                    return response('Cannot change role', 400);
+                }
+                
+                $this->updateUser($user,$validate,$userRole);
+                return response($user);
+            }
+        }
+
+        if (auth()->user()->id === $user->id) {
             if (isset($fields['role_id'])){
                 return response('Cannot change role', 400);
             }
@@ -439,34 +447,25 @@ class UserController extends Controller
                 $user->fill($validate);
                 $user->save();
 
-                return response('User updated');
+                return response($user);
             }
-        }
-
-        if (auth()->user()->role->role=="Admin") {
-            if ( (isset($fields['role_id'])==2 && $user->role_id==3) || ($user->role_id==2 && isset($fields['role_id'])==3)) {
-
-                $this->updateUser($user, $fields, $userRole);
-                return response('User updated');
-            }else{
-                return response('Cannot change role', 400);
-            }
+        } else {
+            return response("Forbidden", 403);
         }
     }
-
 
     private function updateUser($user,$fields,$userRole)
     {
         $user->fill($fields);
         $user->save();
-        if (($fields['company_id'] || $fields['phone']) && $userRole === "Zástupca firmy") {
-            $companyEmployee = CompanyEmployee::where('user_id',$user->id)->get();
+        if ((isset($fields['company_id']) || isset($fields['phone'])) && $userRole === "Zástupca firmy") {
+            $companyEmployee = CompanyEmployee::where('user_id',$user->id)->first();
             $companyEmployee->fill($fields);
             $companyEmployee->save();
         }
-        if($userRole==="Poverený pracovník pracoviska" ||$userRole==="Vedúci pracoviska"){
-            $departmentEmployee=DepartmentEmployee::where('user_id',$user->id)->where('to',null)->get();
-            if($fields["department_id"]){
+        if($userRole==="Poverený pracovník pracoviska" || $userRole==="Vedúci pracoviska"){
+            $departmentEmployee=DepartmentEmployee::where('user_id',$user->id)->where('to',null)->first();
+            if(isset($fields["department_id"])){
                 $departmentEmployee->to=now();
                 $departmentEmployee->save();
                 $newDepartmentEmployee=DepartmentEmployee::create([
@@ -474,11 +473,7 @@ class UserController extends Controller
                     'department_id'=>$fields['department_id'],
                     'from'=>now()
                 ]);
-            }
-            else{
-                $departmentEmployee->fill($fields);
-                $departmentEmployee->save();
-            }
+            }   
         }
     }
 
