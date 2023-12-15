@@ -405,16 +405,15 @@ class UserController extends Controller
         return response()->json($user);
     }
 
-    public function showByRole(Request $request)
+    public function showByRole(Role $role)
     {
-        $users = User::whereHas('role_id'==$request["role_id"]);
 
 
 
         // Kontrola, či používateľ nie je admin, ak nie je, získa iba nezmazaných používateľov
         if (auth()->user()->role->role !== "Admin") {
-            $users->whereNull('deleted_at');
-        }
+            $users = User::whereNull()->where('role_id',$role->id)->get();
+        }else{$users = User::where('role_id',$role->id)->get();}
 
         $result = $users->get();
 

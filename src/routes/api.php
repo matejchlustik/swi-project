@@ -140,7 +140,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::group(['middleware' => ["ability:manage-users-other"]], function () {
         Route::get("/users", [UserController::class, "index"]);
 
-        Route::get("/users/role", [UserController::class, "showByRole"]);
+        Route::get("/users/role/{role}", [UserController::class, "showByRole"]);
 
         Route::get("/users/{user}", [UserController::class, "show"])->withTrashed();
 
