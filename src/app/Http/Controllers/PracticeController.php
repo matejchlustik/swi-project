@@ -23,14 +23,13 @@ class PracticeController extends Controller
             'company_employee_id' => 'required|integer|not_in:0',
             'program_id' => 'required|integer|not_in:0',
             'contract' => ["nullable",File::types(['docx', 'pdf'])],
-            
+
         ]);
         $newPractice = new Practice();
         $newPractice->practice_status_id = PracticeStatus::firstWhere("status", "Neschválená")->id;
         $newPractice->from = $validated['from'];
         $newPractice->to = $validated['to'];
         $newPractice->company_employee_id = $validated['company_employee_id'];
-        $newPractice->department_employee_id = $request->input('department_employee_id');
         $newPractice->program_id = $validated['program_id'];
         $newPractice->user_id = auth()->id();
 
@@ -171,9 +170,9 @@ class PracticeController extends Controller
         if($practice->completion_confirmation) {
             return Storage::download('completionConfirmations/'.$practice->completion_confirmation);
         }
-        $pdf = PDF::loadView('practiceConfirmation', 
+        $pdf = PDF::loadView('practiceConfirmation',
         [
-            'practiceRecords' => $practice->practiceRecords, 
+            'practiceRecords' => $practice->practiceRecords,
             'practice' => $practice,
             'company' => $practice->company,
             'companyEmployee' => $practice->companyEmployee,
@@ -185,14 +184,14 @@ class PracticeController extends Controller
         $practice->completion_confirmation = "completionConfirmation".$practice->id.".pdf";
 
         $practice->save();
- 
+
         return Storage::download('completionConfirmations/'.$practice->completion_confirmation);
     }
 
     public function regenerateCompletionConfirmation(Practice $practice) {
-        $pdf = PDF::loadView('practiceConfirmation', 
+        $pdf = PDF::loadView('practiceConfirmation',
         [
-            'practiceRecords' => $practice->practiceRecords, 
+            'practiceRecords' => $practice->practiceRecords,
             'practice' => $practice,
             'company' => $practice->company,
             'companyEmployee' => $practice->companyEmployee,
@@ -204,7 +203,7 @@ class PracticeController extends Controller
         $practice->completion_confirmation = "completionConfirmation".$practice->id.".pdf";
 
         $practice->save();
- 
+
         return Storage::download('completionConfirmations/'.$practice->completion_confirmation);
     }
 
