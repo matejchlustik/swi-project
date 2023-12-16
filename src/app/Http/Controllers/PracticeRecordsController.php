@@ -16,14 +16,13 @@ class PracticeRecordsController extends Controller
             'to' => 'required|date',
             'description' => 'required|string',
             'hours' => 'required|integer',
-            'practice_id' => 'required|exists:practice,id'
         ]);
 
         $newRecord = new PracticeRecord();
-        $newRecord->from = $request->input('from');
-        $newRecord->to = $request->input('to');
-        $newRecord->description = $request->input('description');
-        $newRecord->hours = $request->input('hours');
+        $newRecord->from = $validatedData['from'];
+        $newRecord->to = $validatedData['to'];
+        $newRecord->description = $validatedData['description'];
+        $newRecord->hours = $validatedData['hours'];
         $newRecord->practice_id = $practice->id;
 
         $newRecord->save();

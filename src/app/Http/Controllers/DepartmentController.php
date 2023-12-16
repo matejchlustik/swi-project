@@ -38,6 +38,7 @@ class DepartmentController extends Controller
         $validatedData = $request->validate([
             'name' => 'string',
             'short' => 'string',
+            'faculty_id' => 'exists:faculties,id',
         ]);
             $department->fill($validatedData);
             $department->save();

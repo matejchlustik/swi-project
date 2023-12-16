@@ -28,16 +28,16 @@ class CompanyController extends Controller
             }
         }
         $validatedData = $request->validate([
-            'ICO' => 'string',
+            'ICO' => 'integer',
             'name' => 'string',
             'city' => 'string',
             'zip_code' => 'string',
             'phone' => 'string',
-            'email' => 'string',
+            'email' => 'email|string',
             'street' => 'string',
             'house_number' => 'string',
         ]);
-        $company->fill($request->all());
+        $company->fill($validatedData);
         $company->save();
 
         return response()->json($company);
@@ -52,16 +52,16 @@ class CompanyController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'ICO' => 'required|string',
+            'ICO' => 'required|integer',
             'name' => 'required|string',
             'city' => 'required|string',
             'zip_code' => 'required|string',
             'phone' => 'required|string',
-            'email' => 'required|string',
+            'email' => 'required|email|string',
             'street' => 'required|string',
             'house_number' => 'required|string',
         ]);
-        $company = Company::create($request->all());
+        $company = Company::create($validatedData);
 
         return response()->json($company,201);
     }

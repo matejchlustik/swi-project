@@ -14,8 +14,6 @@ class EvaluationController extends Controller
     {
         $validated = $request->validate([
             'evaluation' => 'required|integer|between:0,100',
-            'practice_id' => 'required|exists:practice,id',
-            'department_employee_id' => 'required|exists:department_employee,id',
         ]);
 
             $DepartmentEmployee = DepartmentEmployee::where('user_id',auth()->id())->first();

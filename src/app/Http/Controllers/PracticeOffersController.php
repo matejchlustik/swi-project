@@ -32,7 +32,7 @@ class PracticeOffersController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'description' => 'required|text',
+            'description' => 'required|string',
             'phone' => 'required|string',
             'email' => 'required|email',
             'company_department_id' => 'required|exists:company_department,id'
@@ -61,12 +61,13 @@ class PracticeOffersController extends Controller
             }
         }
         $validatedData = $request->validate([
-            'description' => 'text',
+            'description' => 'string',
             'phone' => 'string',
             'email' => 'email',
+            'company_department_id' => 'exists:company_department,id'
         ]);
 
-        $practiceOffer->fill($request->all());
+        $practiceOffer->fill($validatedData);
         $practiceOffer->save();
 
         return response()->json($practiceOffer);
@@ -81,7 +82,7 @@ class PracticeOffersController extends Controller
             }
         }
         $practiceOffer->delete();
-        return response()->json(['message' => 'Úspěšně smazáno']);
+        return response()->json(['message' => 'Practice offer deleted succesfully']);
     }
 
 }

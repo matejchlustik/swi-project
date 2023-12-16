@@ -30,7 +30,7 @@ class FeedbackController extends Controller
     {   
 
         $validatedData = $request->validate([
-            'body' => 'required|text',
+            'body' => 'required|string',
         ]);
         $feedback = Feedback::create([...$validatedData, 'user_id' => auth()->user()->id, 'practice_id' => $practice->id]);
         return response()->json($feedback);
@@ -45,7 +45,7 @@ class FeedbackController extends Controller
             }
         }
         $validatedData = $request->validate([
-            'body' => 'required|text',
+            'body' => 'required|string',
         ]);
             $feedback->fill($validatedData);
             $feedback->save();
