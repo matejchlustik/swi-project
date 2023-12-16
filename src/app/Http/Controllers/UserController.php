@@ -223,11 +223,8 @@ class UserController extends Controller
                             "manage-practice-offers",
                             "manage-company-department",
                             "manage-company",
-                            "edit-company",
                             "manage-comments",
                             "filter-practices",
-                            "manage-feedback",
-                            "read-feedback",
                             "manage-workplaces",
                             "read-workplaces",
                             "manage-evaluation",
@@ -248,12 +245,8 @@ class UserController extends Controller
                             "manage-practice-offers",
                             "manage-company-department",
                             "manage-company",
-                            "edit-company",
                             "manage-comments",
                             "filter-practices",
-                            "manage-feedback",
-                            "read-feedback",
-                            "manage-workplaces",
                             "read-workplaces",
                             "manage-evaluation",
                         ]
@@ -270,13 +263,8 @@ class UserController extends Controller
                             "manage-practice-offers",
                             "manage-company-department",
                             "manage-company",
-                            "edit-company",
                             "manage-comments",
                             "filter-practices",
-                            "manage-feedback",
-                            "read-feedback",
-                            "manage-faculties",
-                            "manage-workplaces",
                             "read-workplaces",
                             "manage-evaluation",
                         ]
@@ -289,8 +277,6 @@ class UserController extends Controller
                             "read-practices",
                             "manage-practice-offers",
                             "edit-company",
-                            "manage-feedback",
-                            "read-feedback",
                             "read-workplaces",
                         ]
                     )->plainTextToken;
@@ -301,9 +287,8 @@ class UserController extends Controller
                             "manage-practices",
                             "read-practices",
                             "manage-comments",
-                            "manage-feedback",
-                            "read-feedback",
                             "read-workplaces",
+                            "read-evaluation",
                         ]
                     )->plainTextToken;
                     break;

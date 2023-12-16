@@ -39,15 +39,17 @@ class EvaluationController extends Controller
             } 
         }
 
-        if(auth()->user()->role->role === "Zástupca firmy") {
-                return response ("Forbidden", 403);
-        }
-
         return response($practice->evaluations->load(["departmentEmployee.user"]));
     }
 
     public function update(Evaluation $evaluation, Request $request)
     {
+        if (auth()->user()->role->role !== "Admin") {
+            if (auth()->user()->id !== $evaluation->user_id) {
+                return response("Forbidden", 403);
+            }
+        }
+
         $validated = $request->validate([
             'evaluation' => 'required|integer|between:0,100',
         ]);

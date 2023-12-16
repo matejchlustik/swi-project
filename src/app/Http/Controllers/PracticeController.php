@@ -157,13 +157,25 @@ class PracticeController extends Controller
     public function getPracticesByPracticeStatus(PracticeStatus $practiceStatus) {
         $practices = Practice::where('practice_status_id', $practiceStatus->id)->latest()->paginate(10);
 
-        return response($practices);
+        return response([
+            'items' => $practices->items(),
+            'prev_page_url' =>$practices->previousPageUrl(),
+            'next_page_url' => $practices->nextPageUrl(),
+            'last_page' =>$practices->lastPage(),
+            'total' => $practices->total()
+        ]);
     }
 
     public function getPracticesByProgram(Program $program) {
         $practices = Practice::where('program_id', $program->id)->latest()->paginate(10);
 
-        return response($practices);
+        return response([
+            'items' => $practices->items(),
+            'prev_page_url' =>$practices->previousPageUrl(),
+            'next_page_url' => $practices->nextPageUrl(),
+            'last_page' =>$practices->lastPage(),
+            'total' => $practices->total()
+        ]);
     }
 
     public function generateCompletionConfirmation(Practice $practice) {

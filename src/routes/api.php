@@ -68,7 +68,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::get("/practice_offers/companies/{company}", [PracticeOffersController::class, "showByCompany"]);
 
             Route::group(['middleware' => ["ability:manage-company-department"]], function () {
-                
                 Route::get("/company_department", [CompanyDepartmentController::class, "index"]);
                 Route::post("/company_department", [CompanyDepartmentController::class, "store"]);
                 Route::get("/company_department/{companyDepartment}", [CompanyDepartmentController::class, "show"]);
@@ -78,23 +77,16 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
                 Route::get("/company_department/companies/{company}", [CompanyDepartmentController::class, "showByCompany"]);
             });
 
-            Route::post("/users", [UserController::class, "store"])->middleware(
-                'ability:create-department-head,create-department-employee,create-company-representative,create-student'
-            );
-
             Route::group(['middleware' => ['ability:manage-comments']], function () {
                 Route::put('/comments/{comment}', [CommentController::class, 'update']);
                 Route::delete('/comments/{comment}', [CommentController::class, 'destroy']);
                 Route::post('/practices/{practice}/comments', [CommentController::class, 'store']);
+                Route::get('/practices/{practice}/comments', [CommentController::class, 'index']);
             });
 
             Route::group(['middleware' => ["ability:read-practices"]], function () {
-                Route::get('/practices/{practice}/evaluations', [EvaluationController::class, 'index']);
-                Route::get('/practices/{practice}/comments', [CommentController::class, 'index']);
                 Route::get('practices/{practice}/practice_records', [PracticeRecordsController::class, "index"]);
-                Route::get('/practices/{practice}/feedback', [FeedbackController::class, 'index']);
                 Route::get('/practices', [PracticeController::class, "index"]);
-    
                 Route::get('/practices/{practice}', [PracticeController::class, "show"]);
             });
 
@@ -112,10 +104,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
             Route::group(['middleware' => ["ability:filter-practices"]], function () {
                 Route::get('/practices/programs/{program}', [PracticeController::class, "getPracticesByProgram"]);
-                Route::get('/practices/practice-statuses/{status}', [PracticeController::class, "getPracticesByPracticeStatus"]);
+                Route::get('/practices/practice-statuses/{practice_status}', [PracticeController::class, "getPracticesByPracticeStatus"]);
             });
 
-            Route::put("/companies/{company}", [CompanyController::class, "update"])->middleware('ability:edit-company');
+            Route::put("/companies/{company}", [CompanyController::class, "update"])->middleware('ability:edit-company,manage-company');
             Route::get("/companies", [CompanyController::class, "index"]);
             Route::get("/companies/{company}", [CompanyController::class, "show"]);
 
@@ -124,11 +116,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
                 Route::post("/companies", [CompanyController::class, "store"]);
             });
 
-            Route::group(['middleware' => ["ability:manage-feedback"]], function () {
-                Route::post("/practices/{practice}/feedback/", [FeedbackController::class, "store"]);
-                Route::delete('/feedback/{feedback}', [FeedbackController::class, "destroy"]);
-                Route::put('/feedback/{feedback}', [FeedbackController::class, 'update']);
-            });
+            Route::post("/practices/{practice}/feedback/", [FeedbackController::class, "store"]);
+            Route::delete('/feedback/{feedback}', [FeedbackController::class, "destroy"]);
+            Route::put('/feedback/{feedback}', [FeedbackController::class, 'update']);
+            Route::get('/practices/{practice}/feedback', [FeedbackController::class, 'index']);
 
             Route::group(['middleware' => ["ability:manage-workplaces"]], function () {
                 Route::post("/faculties", [FacultyController::class, "store"]);
@@ -162,6 +153,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
                 Route::delete('/evaluations/{evaluation}', [EvaluationController::class, 'destroy']);
             });
 
+            Route::get('/practices/{practice}/evaluations', [EvaluationController::class, 'index'])->middleware('ability:read-evaluation,manage-evaluation');
+
             Route::group(['middleware' => ["ability:manage-users"]], function () {
                 Route::get("/users", [UserController::class, "index"])->withTrashed();;
                 Route::get("/users/role/{role}", [UserController::class, "showByRole"])->withTrashed();
@@ -169,7 +162,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
                 Route::delete('/users/{user}', [UserController::class, "deactivate"]);
                 Route::get("/users/departments/{department}", [UserController::class, "showByDepartment"])->withTrashed();
             });
-        
+
+            Route::post("/users", [UserController::class, "store"])->middleware(
+                'ability:create-department-head,create-department-employee,create-company-representative,create-student'
+            );
+            
             Route::put('/users/{user}', [UserController::class, "update"]);
 
     });
