@@ -21,7 +21,7 @@ class CompanyDepartmentController extends Controller
             'total' => $departments->total()
         ]);
     }
-    
+
     public function update(Request $request, CompanyDepartment $companyDepartment)
     {
         $validatedData = $request->validate([
@@ -82,6 +82,29 @@ class CompanyDepartmentController extends Controller
             'last_page' =>$departments->lastPage(),
             'total' => $departments->total()
         ]);
+    }
+    public function restore(CompanyDepartment $companyDepartment){
+        $companyDepartment->restore();
+        return response()->json(['message' => 'Úspešne reaktovovaný']);
+    }
 
+    public function forceDelete(CompanyDepartment $companyDepartment)
+    {
+        $companyDepartment->forceDelete();
+        return response()->json([
+            'message' => 'Používateľ bol úspešne odstránený.',
+        ]);
+    }
+    public function indexDeleted()
+    {
+        $companyDepartments = CompanyDepartment::onlyTrashed()->paginate(20);
+
+        return response([
+            'items' => $companyDepartments->items(),
+            'prev_page_url' => $companyDepartments->previousPageUrl(),
+            'next_page_url' => $companyDepartments->nextPageUrl(),
+            'last_page' => $companyDepartments->lastPage(),
+            'total' => $companyDepartments->total()
+        ]);
     }
 }

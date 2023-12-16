@@ -46,6 +46,7 @@ class CompanyController extends Controller
 
     public function show(Company $company)
     {
+        return response($company->companyEmployees()->user);
         return response()->json($company);
     }
 
@@ -74,5 +75,28 @@ class CompanyController extends Controller
             'message' => 'Company deleted successfully.',
         ]);
     }
+    public function restore(Company $company){
+        $company->restore();
+        return response()->json(['message' => 'Úspešne reaktovovaný']);
+    }
 
+    public function forceDelete(Company $company)
+    {
+        $company->forceDelete();
+        return response()->json([
+            'message' => 'Používateľ bol úspešne odstránený.',
+        ]);
+    }
+    public function indexDeleted()
+    {
+        $companies = Company::onlyTrashed()->paginate(20);
+
+        return response([
+            'items' => $companies->items(),
+            'prev_page_url' => $companies->previousPageUrl(),
+            'next_page_url' => $companies->nextPageUrl(),
+            'last_page' => $companies->lastPage(),
+            'total' => $companies->total()
+        ]);
+    }
 }

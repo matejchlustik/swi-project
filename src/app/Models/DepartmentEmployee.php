@@ -10,7 +10,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DepartmentEmployee extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -20,7 +20,12 @@ class DepartmentEmployee extends Model
     ];
 
     public $timestamps = false;
-
+    public static function booted()
+    {
+static::deleting(function ($departmentEmployee) {
+    $departmentEmployee->user()->get()->each->delete();
+});
+}
     public function user():BelongsTo
     {
         return $this->belongsTo(User::class);

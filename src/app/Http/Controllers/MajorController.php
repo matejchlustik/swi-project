@@ -51,4 +51,28 @@ class MajorController extends Controller
             'message' => 'Major deleted successfully.',
         ]);
     }
+    public function restore(Major $major){
+        $major->restore();
+        return response()->json(['message' => 'Úspešne reaktovovaný']);
+    }
+
+    public function forceDelete(Major $major)
+    {
+        $major->forceDelete();
+        return response()->json([
+            'message' => 'Používateľ bol úspešne odstránený.',
+        ]);
+    }
+    public function indexDeleted()
+    {
+        $majors = Major::onlyTrashed()->paginate(20);
+
+        return response([
+            'items' => $majors->items(),
+            'prev_page_url' => $majors->previousPageUrl(),
+            'next_page_url' => $majors->nextPageUrl(),
+            'last_page' => $majors->lastPage(),
+            'total' => $majors->total()
+        ]);
+    }
 }

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('department_employee_id')->constrained();
             $table->tinyInteger('evaluation');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

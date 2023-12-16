@@ -14,30 +14,30 @@ class FeedbackController extends Controller
         if(auth()->user()->role->role === "Študent") {
             if($practice->user_id != auth()->id()) {
                 return response ("Forbidden", 403);
-            } 
+            }
         }
 
         if(auth()->user()->role->role === "Zástupca firmy") {
             if($practice->companyEmployee->id != auth()->user()->companyEmployee->id) {
                 return response ("Forbidden", 403);
-            } 
+            }
         }
 
         return response($practice->feedback->load(["user"]));
     }
 
     public function store(Request $request, Practice $practice)
-    {   
+    {
         if(auth()->user()->role->role === "Študent") {
             if($practice->user_id != auth()->id()) {
                 return response ("Forbidden", 403);
-            } 
+            }
         }
 
         if(auth()->user()->role->role === "Zástupca firmy") {
             if($practice->companyEmployee->id != auth()->user()->companyEmployee->id) {
                 return response ("Forbidden", 403);
-            } 
+            }
         }
 
         $validatedData = $request->validate([
@@ -73,6 +73,30 @@ class FeedbackController extends Controller
         }
         $feedback->delete();
         return response()->json(['message' => 'Feedback deleted successfully.']);
+    }
+    public function restore(Feedback $feedback){
+        $feedback->restore();
+        return response()->json(['message' => 'Úspešne reaktovovaný']);
+    }
+
+    public function forceDelete(Feedback $feedback)
+    {
+        $feedback->forceDelete();
+        return response()->json([
+            'message' => 'Používateľ bol úspešne odstránený.',
+        ]);
+    }
+    public function indexDeleted()
+    {
+        $feedbacks = Feedback::onlyTrashed()->paginate(20);
+
+        return response([
+            'items' => $feedbacks->items(),
+            'prev_page_url' => $feedbacks->previousPageUrl(),
+            'next_page_url' => $feedbacks->nextPageUrl(),
+            'last_page' => $feedbacks->lastPage(),
+            'total' => $feedbacks->total()
+        ]);
     }
 
 }

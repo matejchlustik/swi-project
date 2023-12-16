@@ -19,6 +19,7 @@ return new class extends Migration
             $table->integer('hours');
             $table->foreignId('practice_id')->constrained()->onDelete('cascade');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

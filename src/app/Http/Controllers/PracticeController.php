@@ -208,7 +208,7 @@ class PracticeController extends Controller
     }
 
     public function regenerateCompletionConfirmation(Practice $practice) {
-        
+
         if(auth()->user()->role->role === "Študent") {
             if($practice->user_id !== auth()->id()) {
                 return response ("Forbidden", 403);
@@ -232,7 +232,30 @@ class PracticeController extends Controller
 
         return Storage::download('completionConfirmations/'.$practice->completion_confirmation);
     }
+    public function restore(Practice $practice){
+        $practice->restore();
+        return response()->json(['message' => 'Úspešne reaktovovaný']);
+    }
 
+    public function forceDelete(Practice $practice)
+    {
+        $practice->forceDelete();
+        return response()->json([
+            'message' => 'Používateľ bol úspešne odstránený.',
+        ]);
+    }
+    public function indexDeleted()
+    {
+        $practices = Practice::onlyTrashed()->paginate(20);
+
+        return response([
+            'items' => $practices->items(),
+            'prev_page_url' => $practices->previousPageUrl(),
+            'next_page_url' => $practices->nextPageUrl(),
+            'last_page' => $practices->lastPage(),
+            'total' => $practices->total()
+        ]);
+    }
 
 
 }

@@ -15,9 +15,9 @@ class PracticeRecordsController extends Controller
         if(auth()->user()->role->role === "Študent") {
             if($practice->user_id != auth()->id()) {
                 return response ("Forbidden", 403);
-            } 
+            }
         }
-        
+
         $validatedData = $request->validate([
             'from' => 'required|date',
             'to' => 'required|date',
@@ -43,13 +43,13 @@ class PracticeRecordsController extends Controller
         if(auth()->user()->role->role === "Študent") {
             if($practice->user_id != auth()->id()) {
                 return response ("Forbidden", 403);
-            } 
+            }
         }
 
         if(auth()->user()->role->role === "Zástupca firmy") {
             if($practice->companyEmployee->id != auth()->user()->companyEmployee->id) {
                 return response ("Forbidden", 403);
-            } 
+            }
         }
 
         return response($practice->practiceRecords);
@@ -60,7 +60,7 @@ class PracticeRecordsController extends Controller
         if(auth()->user()->role->role === "Študent") {
             if($practiceRecord->practice->user_id != auth()->id()) {
                 return response ("Forbidden", 403);
-            } 
+            }
         }
         $validatedData = $request->validate([
             'from' => 'date',
@@ -81,13 +81,37 @@ class PracticeRecordsController extends Controller
         if(auth()->user()->role->role === "Študent") {
             if($practiceRecord->practice->user_id != auth()->id()) {
                 return response ("Forbidden", 403);
-            } 
+            }
         }
-        
+
         $practiceRecord->delete();
 
         return response()->json([
             'message' => 'Practice record deleted successfully.',
+        ]);
+    }
+    public function restore(PracticeRecord $practiceRecord){
+        $practiceRecord->restore();
+        return response()->json(['message' => 'Úspešne reaktovovaný']);
+    }
+
+    public function forceDelete(PracticeRecord $user)
+    {
+        $user->forceDelete();
+        return response()->json([
+            'message' => 'Používateľ bol úspešne odstránený.',
+        ]);
+    }
+    public function indexDeleted()
+    {
+        $users = User::onlyTrashed()->paginate(20);
+
+        return response([
+            'items' => $users->items(),
+            'prev_page_url' => $users->previousPageUrl(),
+            'next_page_url' => $users->nextPageUrl(),
+            'last_page' => $users->lastPage(),
+            'total' => $users->total()
         ]);
     }
 }

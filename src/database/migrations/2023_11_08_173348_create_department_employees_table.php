@@ -17,6 +17,7 @@ return new class extends Migration
             $table->foreignId('department_id')->constrained();
             $table->date('from');
             $table->date('to')->nullable()->default(null);
+            $table->softDeletes();
         });
     }
 

@@ -24,6 +24,7 @@ class CreateCompaniesTable extends Migration
             $table->string('street');
             $table->string('house_number');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

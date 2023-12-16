@@ -51,4 +51,28 @@ class FacultyController extends Controller
             'message' => 'Faculty deleted successfully.',
         ]);
     }
+    public function restore(Faculty $faculty){
+        $faculty->restore();
+        return response()->json(['message' => 'Úspešne reaktovovaný']);
+    }
+
+    public function forceDelete(Faculty $faculty)
+    {
+        $faculty->forceDelete();
+        return response()->json([
+            'message' => 'Používateľ bol úspešne odstránený.',
+        ]);
+    }
+    public function indexDeleted()
+    {
+        $faculties = Faculty::onlyTrashed()->paginate(20);
+
+        return response([
+            'items' => $faculties->items(),
+            'prev_page_url' => $faculties->previousPageUrl(),
+            'next_page_url' => $faculties->nextPageUrl(),
+            'last_page' => $faculties->lastPage(),
+            'total' => $faculties->total()
+        ]);
+    }
 }

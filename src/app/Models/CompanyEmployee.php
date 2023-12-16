@@ -7,10 +7,11 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CompanyEmployee extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
 
     protected $fillable = [
         'user_id',
@@ -19,7 +20,12 @@ class CompanyEmployee extends Model
     ];
 
     public $timestamps = false;
-
+    public static function booted()
+    {
+        static::deleting(function ($companyEmployee) {
+            $companyEmployee->user()->get()->each->delete();
+        });
+    }
     public function practice() :HasMany
     {
         return $this->hasMany(Practice::class);

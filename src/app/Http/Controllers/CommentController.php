@@ -14,7 +14,7 @@ class CommentController extends Controller
         if(auth()->user()->role->role === "Študent") {
             if($practice->user_id != auth()->id()) {
                 return response ("Forbidden", 403);
-            } 
+            }
         }
 
         return response($practice->comments->load(["user"]));
@@ -55,5 +55,29 @@ class CommentController extends Controller
         }
         $comment->delete();
         return response()->json(['message' => 'Comment deleted successfully.']);
+    }
+    public function restore(Comment $comment){
+        $comment->restore();
+        return response()->json(['message' => 'Úspešne reaktovovaný']);
+    }
+
+    public function forceDelete(Comment $comment)
+    {
+        $comment->forceDelete();
+        return response()->json([
+            'message' => 'Používateľ bol úspešne odstránený.',
+        ]);
+    }
+    public function indexDeleted()
+    {
+        $comments = Comment::onlyTrashed()->paginate(20);
+
+        return response([
+            'items' => $comments->items(),
+            'prev_page_url' => $comments->previousPageUrl(),
+            'next_page_url' => $comments->nextPageUrl(),
+            'last_page' => $comments->lastPage(),
+            'total' => $comments->total()
+        ]);
     }
 }

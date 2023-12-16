@@ -84,5 +84,30 @@ class PracticeOffersController extends Controller
         $practiceOffer->delete();
         return response()->json(['message' => 'Practice offer deleted succesfully']);
     }
+    public function restore(PracticeOffer $practiceOffer){
+        $practiceOffer->restore();
+        return response()->json(['message' => 'Úspešne reaktovovaný']);
+    }
+
+    public function forceDelete(PracticeOffer $practiceOffer)
+    {
+        $practiceOffer->forceDelete();
+        return response()->json([
+            'message' => 'Používateľ bol úspešne odstránený.',
+        ]);
+    }
+    public function indexDeleted()
+    {
+        $practiceOffers = PracticeOffer::onlyTrashed()->paginate(20);
+
+        return response([
+            'items' => $practiceOffers->items(),
+            'prev_page_url' => $practiceOffers->previousPageUrl(),
+            'next_page_url' => $practiceOffers->nextPageUrl(),
+            'last_page' => $practiceOffers->lastPage(),
+            'total' => $practiceOffers->total()
+        ]);
+    }
+
 
 }

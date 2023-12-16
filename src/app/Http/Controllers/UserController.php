@@ -229,7 +229,8 @@ class UserController extends Controller
                             "read-workplaces",
                             "manage-evaluation",
                             "manage-company",
-                            "manage-users"
+                            "manage-users",
+                            "admin-deleted-data"
                         ]
                     )->plainTextToken;
                     break;
@@ -399,7 +400,7 @@ class UserController extends Controller
         return response($users);
     }
 
-    public function deactivate(User $user)
+    public function destroy(User $user)
     {
         $user->delete();
         $user->tokens()->delete();      //toto by som asi nemal vymazavat alebo pri activate by som mal spravit token znova
@@ -411,7 +412,7 @@ class UserController extends Controller
         return response()->json(['message' => 'Úspešne reaktovovaný']);
     }
 
-    public function destroy(User $user)
+    public function forceDelete(User $user)
     {
                 $user->forceDelete();
                 return response()->json([
@@ -430,7 +431,14 @@ class UserController extends Controller
 
     public function showByRole(Role $role)
     {
-        return response()->json($role->users);
+        $users=$role->users()->paginate(10);
+        return response([
+            'items' => $users->items(),
+            'prev_page_url' =>$users->previousPageUrl(),
+            'next_page_url' => $users->nextPageUrl(),
+            'last_page' =>$users->lastPage(),
+            'total' => $users->total()
+        ]);
     }
 
 
@@ -456,7 +464,7 @@ class UserController extends Controller
                 if (isset($fields['role_id'])){
                     return response('Cannot change role', 400);
                 }
-                
+
                 $this->updateUser($user,$validate,$userRole);
                 return response($user);
             }
@@ -501,7 +509,7 @@ class UserController extends Controller
                     'department_id'=>$fields['department_id'],
                     'from'=>now()
                 ]);
-            }   
+            }
         }
     }
 

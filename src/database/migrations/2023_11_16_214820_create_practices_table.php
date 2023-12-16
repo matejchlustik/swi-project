@@ -21,6 +21,7 @@ return new class extends Migration
             $table->string('contract',255)->nullable();
             $table->string('completion_confirmation',255)->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

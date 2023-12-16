@@ -7,14 +7,34 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Practice extends Model
 {
-    use HasFactory;
+    use HasFactory,SoftDeletes;
 
     protected $guarded = [
         'id'
     ];
+
+    public static function booted()
+    {
+
+        static::deleting(function ($practice) {
+            $practice->comments()->get()->each->delete();
+            $practice->evaluations()->get()->each->delete();
+            $practice->feedback()->get()->each->delete();
+            $practice->practiceRecords()->get()->each->delete();
+        });
+
+
+        static::restored(function ($practice) {
+            $practice->comments()->withTrashed()->get()->each->restore();
+            $practice->evaluations()->withTrashed()->get()->each->restore();
+            $practice->feedback()->withTrashed()->get()->each->restore();
+            $practice->practiceRecords()->withTrashed()->get()->each->restore();
+        });
+    }
 
     public function practiceRecords() :HasMany
     {

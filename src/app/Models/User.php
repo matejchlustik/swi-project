@@ -56,10 +56,22 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-
+    public static function booted()
+    {
+        static::deleting(function ($user) {
+            $companyEmployees=$user->departmentEmployee;
+            foreach ($companyEmployees as $employee){
+                $employee->delete();
+            }
+            //$user->departmentEmployee()->get()->each->delete();
+        });
+        static::restored(function ($user) {
+            $user->departmentEmployee()->withTrashed()->get()->each->restore();
+            $user->companyEmployee()->withTrashed()->get()->each->restore();
+        });
+    }
     public function sendPasswordResetNotification($token)
     {
-        // Your your own implementation.
         $this->notify(new ResetPassword($token));
     }
 
@@ -82,7 +94,7 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(CompanyEmployee::class);
     }
-    
+
     public function departmentEmployee() :HasMany
     {
         return $this->hasMany(DepartmentEmployee::class);
