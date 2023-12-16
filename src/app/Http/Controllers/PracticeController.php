@@ -179,6 +179,13 @@ class PracticeController extends Controller
     }
 
     public function generateCompletionConfirmation(Practice $practice) {
+
+        if(auth()->user()->role->role === "Študent") {
+            if($practice->user_id !== auth()->id()) {
+                return response ("Forbidden", 403);
+            }
+        }
+
         if($practice->completion_confirmation) {
             return Storage::download('completionConfirmations/'.$practice->completion_confirmation);
         }
@@ -201,6 +208,13 @@ class PracticeController extends Controller
     }
 
     public function regenerateCompletionConfirmation(Practice $practice) {
+        
+        if(auth()->user()->role->role === "Študent") {
+            if($practice->user_id !== auth()->id()) {
+                return response ("Forbidden", 403);
+            }
+        }
+
         $pdf = PDF::loadView('practiceConfirmation',
         [
             'practiceRecords' => $practice->practiceRecords,
