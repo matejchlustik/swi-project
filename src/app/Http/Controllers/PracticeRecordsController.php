@@ -11,11 +11,18 @@ class PracticeRecordsController extends Controller
 
     public function store(Request $request, Practice $practice)
     {
+        $validatedData = $request->validate([
+            'from' => 'required|date',
+            'to' => 'required|date',
+            'description' => 'required|string',
+            'hours' => 'required|integer',
+        ]);
+
         $newRecord = new PracticeRecord();
-        $newRecord->from = $request->input('from');
-        $newRecord->to = $request->input('to');
-        $newRecord->description = $request->input('description');
-        $newRecord->hours = $request->input('hours');
+        $newRecord->from = $validatedData['from'];
+        $newRecord->to = $validatedData['to'];
+        $newRecord->description = $validatedData['description'];
+        $newRecord->hours = $validatedData['hours'];
         $newRecord->practice_id = $practice->id;
 
         $newRecord->save();
@@ -48,6 +55,12 @@ class PracticeRecordsController extends Controller
                 return response ("Forbidden", 403);
             } 
         }
+        $validatedData = $request->validate([
+            'from' => 'date',
+            'to' => 'date',
+            'description' => 'string',
+            'hours' => 'integer',
+        ]);
 
         $practiceRecord->fill($request->all());
         $practiceRecord->save();

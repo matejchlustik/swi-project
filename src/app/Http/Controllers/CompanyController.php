@@ -27,8 +27,17 @@ class CompanyController extends Controller
                 return response("Forbidden", 403);
             }
         }
-
-        $company->fill($request->all());
+        $validatedData = $request->validate([
+            'ICO' => 'integer',
+            'name' => 'string',
+            'city' => 'string',
+            'zip_code' => 'string',
+            'phone' => 'string',
+            'email' => 'email|string',
+            'street' => 'string',
+            'house_number' => 'string',
+        ]);
+        $company->fill($validatedData);
         $company->save();
 
         return response()->json($company);
@@ -42,7 +51,17 @@ class CompanyController extends Controller
 
     public function store(Request $request)
     {
-        $company = Company::create($request->all());
+        $validatedData = $request->validate([
+            'ICO' => 'required|integer',
+            'name' => 'required|string',
+            'city' => 'required|string',
+            'zip_code' => 'required|string',
+            'phone' => 'required|string',
+            'email' => 'required|email|string',
+            'street' => 'required|string',
+            'house_number' => 'required|string',
+        ]);
+        $company = Company::create($validatedData);
 
         return response()->json($company,201);
     }

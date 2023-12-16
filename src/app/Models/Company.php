@@ -14,7 +14,7 @@ class Company extends Model
         'ICO',
         'name',
         'city',
-        'ZIP_code',
+        'zip_code',
         'phone',
         'email',
         'street',

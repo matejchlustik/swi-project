@@ -38,6 +38,7 @@ class ProgramController extends Controller
         $validatedData = $request->validate([
             'name' => 'string',
             'short' => 'string',
+            'major_id' => 'exists:majors,id',
         ]);
             $program->fill($validatedData);
             $program->save();
@@ -49,7 +50,7 @@ class ProgramController extends Controller
         $program->delete();
 
         return response()->json([
-            'message' => 'Faculty deleted successfully.',
+            'message' => 'Program deleted successfully.',
         ]);
     }
 }

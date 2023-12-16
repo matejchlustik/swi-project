@@ -20,8 +20,8 @@ class PracticeController extends Controller
         $validated = $request->validate([
             'from' => 'required|date',
             'to' => 'required|date|after:from',
-            'company_employee_id' => 'required|integer|not_in:0',
-            'program_id' => 'required|integer|not_in:0',
+            'company_employee_id' => 'required|integer|not_in:0|exists:company_employees,id',
+            'program_id' => 'required|integer|not_in:0|exists:programs,id',
             'contract' => ["nullable",File::types(['docx', 'pdf'])],
 
         ]);
@@ -95,7 +95,7 @@ class PracticeController extends Controller
              'from' => 'date',
              'to' => 'date|after:from',
              'company_employee_id' => 'integer|not_in:0',
-             'program_id' => 'integer|not_in:0',
+             'program_id' => 'integer|not_in:0|exists:programs,id',
              'contract' => ["nullable",File::types(['docx', 'pdf'])],
              'practice_status_id' => 'integer|exists:practice_statuses,id'
          ]);

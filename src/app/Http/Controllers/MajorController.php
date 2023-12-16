@@ -26,7 +26,6 @@ class MajorController extends Controller
     public function store(Request $request){
         $validatedData = $request->validate([
             'name' => 'required|string',
-            'short' => 'required|string',
             'department_id' => 'required|exists:departments,id',
         ]);
         $major= Major::create($validatedData);
@@ -37,7 +36,7 @@ class MajorController extends Controller
     public function update(Major $major, Request $request){
         $validatedData = $request->validate([
             'name' => 'string',
-            'short' => 'string',
+            'department_id' => 'exists:departments,id',
         ]);
             $major->fill($validatedData);
             $major->save();
@@ -49,7 +48,7 @@ class MajorController extends Controller
         $major->delete();
 
         return response()->json([
-            'message' => 'Faculty deleted successfully.',
+            'message' => 'Major deleted successfully.',
         ]);
     }
 }
