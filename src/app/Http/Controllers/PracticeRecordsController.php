@@ -11,6 +11,13 @@ class PracticeRecordsController extends Controller
 
     public function store(Request $request, Practice $practice)
     {
+
+        if(auth()->user()->role->role === "Študent") {
+            if($practice->user_id != auth()->id()) {
+                return response ("Forbidden", 403);
+            } 
+        }
+        
         $validatedData = $request->validate([
             'from' => 'required|date',
             'to' => 'required|date',
@@ -62,7 +69,7 @@ class PracticeRecordsController extends Controller
             'hours' => 'integer',
         ]);
 
-        $practiceRecord->fill($request->all());
+        $practiceRecord->fill($validatedData);
         $practiceRecord->save();
 
         return response()->json($practiceRecord);

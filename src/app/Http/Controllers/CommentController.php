@@ -17,10 +17,6 @@ class CommentController extends Controller
             } 
         }
 
-        if(auth()->user()->role->role === "Zástupca firmy") {
-                return response ("Forbidden", 403);
-        }
-
         return response($practice->comments->load(["user"]));
     }
 

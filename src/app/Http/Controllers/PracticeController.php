@@ -157,16 +157,35 @@ class PracticeController extends Controller
     public function getPracticesByPracticeStatus(PracticeStatus $practiceStatus) {
         $practices = Practice::where('practice_status_id', $practiceStatus->id)->latest()->paginate(10);
 
-        return response($practices);
+        return response([
+            'items' => $practices->items(),
+            'prev_page_url' =>$practices->previousPageUrl(),
+            'next_page_url' => $practices->nextPageUrl(),
+            'last_page' =>$practices->lastPage(),
+            'total' => $practices->total()
+        ]);
     }
 
     public function getPracticesByProgram(Program $program) {
         $practices = Practice::where('program_id', $program->id)->latest()->paginate(10);
 
-        return response($practices);
+        return response([
+            'items' => $practices->items(),
+            'prev_page_url' =>$practices->previousPageUrl(),
+            'next_page_url' => $practices->nextPageUrl(),
+            'last_page' =>$practices->lastPage(),
+            'total' => $practices->total()
+        ]);
     }
 
     public function generateCompletionConfirmation(Practice $practice) {
+
+        if(auth()->user()->role->role === "Študent") {
+            if($practice->user_id !== auth()->id()) {
+                return response ("Forbidden", 403);
+            }
+        }
+
         if($practice->completion_confirmation) {
             return Storage::download('completionConfirmations/'.$practice->completion_confirmation);
         }
@@ -189,6 +208,13 @@ class PracticeController extends Controller
     }
 
     public function regenerateCompletionConfirmation(Practice $practice) {
+        
+        if(auth()->user()->role->role === "Študent") {
+            if($practice->user_id !== auth()->id()) {
+                return response ("Forbidden", 403);
+            }
+        }
+
         $pdf = PDF::loadView('practiceConfirmation',
         [
             'practiceRecords' => $practice->practiceRecords,

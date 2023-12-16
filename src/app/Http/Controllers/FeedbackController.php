@@ -28,6 +28,17 @@ class FeedbackController extends Controller
 
     public function store(Request $request, Practice $practice)
     {   
+        if(auth()->user()->role->role === "Študent") {
+            if($practice->user_id != auth()->id()) {
+                return response ("Forbidden", 403);
+            } 
+        }
+
+        if(auth()->user()->role->role === "Zástupca firmy") {
+            if($practice->companyEmployee->id != auth()->user()->companyEmployee->id) {
+                return response ("Forbidden", 403);
+            } 
+        }
 
         $validatedData = $request->validate([
             'body' => 'required|string',
@@ -56,9 +67,9 @@ class FeedbackController extends Controller
     public function destroy(Feedback $feedback)
     {
         if (auth()->user()->role->role !== "Admin") {
-        if (auth()->user()->id !== $feedback->user_id) {
-                return response("Forbidden", 403);
-        }
+            if (auth()->user()->id !== $feedback->user_id) {
+                    return response("Forbidden", 403);
+            }
         }
         $feedback->delete();
         return response()->json(['message' => 'Feedback deleted successfully.']);
