@@ -392,12 +392,13 @@ class UserController extends Controller
     {
         $users = Department::find($department->id)->users()->paginate(10);
 
-
-        if (auth()->user()->role->role !== "Admin") {
-            $users->whereNull('deleted_at');
-        }
-
-        return response($users);
+        return response([
+            'items' => $users->items(),
+            'prev_page_url' =>$users->previousPageUrl(),
+            'next_page_url' => $users->nextPageUrl(),
+            'last_page' =>$users->lastPage(),
+            'total' => $users->total()
+        ]);
     }
 
     public function destroy(User $user)

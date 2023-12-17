@@ -171,6 +171,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
             Route::group(['middleware' => ["ability:admin-deleted-data"]], function () {
                 Route::put("/departments/{department}/restore", [DepartmentController::class, "restore"])->withTrashed();
+                Route::put("/evaluations/{evaluation}/restore", [EvaluationController::class, "restore"])->withTrashed();
                 Route::put("/comment/{comment}/restore", [CommentController::class, "restore"])->withTrashed();
                 Route::put("/company/{company}/restore", [CommentController::class, "restore"])->withTrashed();
                 Route::put("/company_department/{company_department}/restore", [CompanyDepartmentController::class, "restore"])->withTrashed();
@@ -183,6 +184,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
                 Route::put("/programs/{program}/restore", [ProgramController::class, "restore"])->withTrashed();
                 Route::put("/users/{user}/restore", [UserController::class, "restore"])->withTrashed();
                 Route::delete("/departments/{department}/force-delete", [DepartmentController::class, "forceDelete"])->withTrashed();
+                Route::delete("/evaluations/{evaluation}/force-delete", [EvaluationController::class, "forceDelete"])->withTrashed();
                 Route::delete("/comment/{comment}/force-delete", [CommentController::class, "forceDelete"])->withTrashed();
                 Route::delete("/company/{company}/force-delete", [CommentController::class, "forceDelete"])->withTrashed();
                 Route::delete("/company_department/{company_department}/force-delete", [CompanyDepartmentController::class, "forceDelete"])->withTrashed();
@@ -195,6 +197,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
                 Route::delete("/programs/{program}/force-delete", [ProgramController::class, "forceDelete"])->withTrashed();
                 Route::delete("/users/{user}/force-delete", [UserController::class, "forceDelete"])->withTrashed();
                 Route::get("/departments/soft_deleted", [DepartmentController::class, "indexDeleted"]);
+                Route::get("/evaluations/soft_deleted", [EvaluationController::class, "indexDeleted"]);
                 Route::get("/comment/soft_deleted", [CommentController::class, "indexDeleted"]);
                 Route::get("/company/soft_deleted", [CommentController::class, "indexDeleted"]);
                 Route::get("/company_department/soft_deleted", [CompanyDepartmentController::class, "indexDeleted"]);
