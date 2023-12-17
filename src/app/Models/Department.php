@@ -25,15 +25,12 @@ class Department extends Model
 
         static::deleting(function ($department) {
             $department->major()->get()->each->delete();
-            $department->departmentEmployee()->get()->each->delete();
             CompanyDepartment::where("department_id",$department->id)->get()->each->delete();
         });
 
 
         static::restored(function ($department) {
             $department->major()->withTrashed()->get()->each->restore();
-            $department->departmentEmployee()->withTrashed()->get()->each->restore();
-            CompanyDepartment::where("department_id",$department->id)->withTrashed()->get()->each->restore();
         });
     }
     public function faculty() :BelongsTo

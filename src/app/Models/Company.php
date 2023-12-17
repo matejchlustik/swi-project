@@ -25,7 +25,6 @@ class Company extends Model
     public static function booted()
     {
         static::deleting(function ($company) {
-            $company->companyEmployees()->get()->each->delete();
             CompanyDepartment::where("company_id",$company->id)->withTrashed()->get()->each->delete();
         });
     }

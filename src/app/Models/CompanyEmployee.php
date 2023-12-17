@@ -20,12 +20,7 @@ class CompanyEmployee extends Model
     ];
 
     public $timestamps = false;
-    public static function booted()
-    {
-        static::deleting(function ($companyEmployee) {
-            $companyEmployee->user()->get()->each->delete();
-        });
-    }
+
     public function practice() :HasMany
     {
         return $this->hasMany(Practice::class);

@@ -21,18 +21,18 @@ class Practice extends Model
     {
 
         static::deleting(function ($practice) {
-            $practice->comments()->get()->each->delete();
-            $practice->evaluations()->get()->each->delete();
-            $practice->feedback()->get()->each->delete();
-            $practice->practiceRecords()->get()->each->delete();
+            $practice->comments()->delete();
+            $practice->evaluations()->delete();
+            $practice->feedback()->delete();
+            $practice->practiceRecords()->delete();
         });
 
 
         static::restored(function ($practice) {
-            $practice->comments()->withTrashed()->get()->each->restore();
-            $practice->evaluations()->withTrashed()->get()->each->restore();
-            $practice->feedback()->withTrashed()->get()->each->restore();
-            $practice->practiceRecords()->withTrashed()->get()->each->restore();
+            $practice->comments()->withTrashed()->restore();
+            $practice->evaluations()->withTrashed()->restore();
+            $practice->feedback()->withTrashed()->restore();
+            $practice->practiceRecords()->withTrashed()->restore();
         });
     }
 

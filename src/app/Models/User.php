@@ -59,15 +59,12 @@ class User extends Authenticatable implements MustVerifyEmail
     public static function booted()
     {
         static::deleting(function ($user) {
-            $companyEmployees=$user->departmentEmployee;
-            foreach ($companyEmployees as $employee){
-                $employee->delete();
-            }
-            //$user->departmentEmployee()->get()->each->delete();
+            $user->departmentEmployee()->delete();
+            $user->companyEmployee()->delete();
         });
         static::restored(function ($user) {
-            $user->departmentEmployee()->withTrashed()->get()->each->restore();
-            $user->companyEmployee()->withTrashed()->get()->each->restore();
+            $user->departmentEmployee()->withTrashed()->restore();
+            $user->companyEmployee()->withTrashed()->restore();
         });
     }
     public function sendPasswordResetNotification($token)

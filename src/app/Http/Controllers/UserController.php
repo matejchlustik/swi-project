@@ -479,11 +479,9 @@ class UserController extends Controller
                     'first_name' => 'string',
                     'last_name' => 'string',
                     'email' => 'email',
+                    'phone'=>'string'
                 ]);
-                $user->fill($validate);
-                $user->save();
-
-                return response($user);
+                return response($this->updateUser($user, $validate, $userRole));
             }
         } else {
             return response("Forbidden", 403);
@@ -498,6 +496,7 @@ class UserController extends Controller
             $companyEmployee = CompanyEmployee::where('user_id',$user->id)->first();
             $companyEmployee->fill($fields);
             $companyEmployee->save();
+            return $user->load(["companyEmployee"]);
         }
         if($userRole==="Poverený pracovník pracoviska" || $userRole==="Vedúci pracoviska"){
             $departmentEmployee=DepartmentEmployee::where('user_id',$user->id)->where('to',null)->first();
@@ -509,8 +508,11 @@ class UserController extends Controller
                     'department_id'=>$fields['department_id'],
                     'from'=>now()
                 ]);
+
             }
+            return $user->load(["departmentEmployee"]);
         }
+        return $user;
     }
 
 
