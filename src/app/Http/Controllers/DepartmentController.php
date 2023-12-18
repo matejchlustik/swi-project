@@ -55,14 +55,14 @@ class DepartmentController extends Controller
     }
     public function restore(Department $department){
         $department->restore();
-        return response()->json(['message' => 'Úspešne reaktovovaný']);
+        return response()->json(['message' => 'Úspešne obnovený záznam']);
     }
 
     public function forceDelete(Department $department)
     {
         $department->forceDelete();
         return response()->json([
-            'message' => 'Používateľ bol úspešne odstránený.',
+            'message' => 'Úspešne odstránený záznam',
         ]);
     }
     public function indexDeleted()

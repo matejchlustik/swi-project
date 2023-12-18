@@ -86,14 +86,14 @@ class PracticeOffersController extends Controller
     }
     public function restore(PracticeOffer $practiceOffer){
         $practiceOffer->restore();
-        return response()->json(['message' => 'Úspešne reaktovovaný']);
+        return response()->json(['message' => 'úspešne obnovený záznam']);
     }
 
     public function forceDelete(PracticeOffer $practiceOffer)
     {
         $practiceOffer->forceDelete();
         return response()->json([
-            'message' => 'Používateľ bol úspešne odstránený.',
+            'message' => 'úspešne odstránený záznam',
         ]);
     }
     public function indexDeleted()

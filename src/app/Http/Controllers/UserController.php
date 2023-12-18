@@ -406,18 +406,21 @@ class UserController extends Controller
         $user->delete();
         $user->tokens()->delete();      //toto by som asi nemal vymazavat alebo pri activate by som mal spravit token znova
         $user->save();
-        return response()->json(['message' => 'Úspešne deaktivovaný']);
+        return response()->json(['message' => 'Úspešne zmazaný']);
     }
     public function restore(User $user){
         $user->restore();
-        return response()->json(['message' => 'Úspešne reaktovovaný']);
+        return response()->json(['message' => 'Úspešne obnovený záznam']);
     }
 
     public function forceDelete(User $user)
     {
+                if($user->id === auth()->user()->id) {
+                    return response("Cant delete yourself");
+                }
                 $user->forceDelete();
                 return response()->json([
-                    'message' => 'Používateľ bol úspešne odstránený.',
+                    'message' => 'úspešne odstránený záznam',
                 ]);
     }
 

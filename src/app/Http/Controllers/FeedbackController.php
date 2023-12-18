@@ -76,14 +76,14 @@ class FeedbackController extends Controller
     }
     public function restore(Feedback $feedback){
         $feedback->restore();
-        return response()->json(['message' => 'Úspešne reaktovovaný']);
+        return response()->json(['message' => 'Úspešne obnovený záznam']);
     }
 
     public function forceDelete(Feedback $feedback)
     {
         $feedback->forceDelete();
         return response()->json([
-            'message' => 'Používateľ bol úspešne odstránený.',
+            'message' => 'úspešne odstránený záznam',
         ]);
     }
     public function indexDeleted()

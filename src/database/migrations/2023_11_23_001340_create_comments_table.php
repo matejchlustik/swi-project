@@ -17,10 +17,10 @@ class CreateCommentsTable extends Migration
             $table->id();
             $table->text('body');
             $table->unsignedBigInteger('practice_id');
-            $table->unsignedBigInteger('user_id');
+            $table->unsignedBigInteger('user_id')->nullable();
             $table->timestamps();
             $table->foreign('practice_id')->references('id')->on('practices')->onDelete("cascade");
-            $table->foreign('user_id')->references('id')->on('users')->onDelete("cascade");
+            $table->foreign('user_id')->references('id')->on('users')->nullOnDelete();
             $table->softDeletes();
         });
     }

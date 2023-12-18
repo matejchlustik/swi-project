@@ -58,14 +58,14 @@ class CommentController extends Controller
     }
     public function restore(Comment $comment){
         $comment->restore();
-        return response()->json(['message' => 'Úspešne reaktovovaný']);
+        return response()->json(['message' => 'Úspešne obnovený záznam']);
     }
 
     public function forceDelete(Comment $comment)
     {
         $comment->forceDelete();
         return response()->json([
-            'message' => 'Používateľ bol úspešne odstránený.',
+            'message' => 'úspešne odstránený záznam',
         ]);
     }
     public function indexDeleted()

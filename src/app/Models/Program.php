@@ -24,12 +24,12 @@ class Program extends Model
             $program->practices()->get()->each->delete();
         });
         static::restored(function ($program) {
-            $program->practice()->withTrashed()->get()->each->restore();
+            $program->practices()->withTrashed()->get()->each->restore();
         });
     }
     public function major() :BelongsTo
     {
-        return $this->belongsTo(Majors::class);
+        return $this->belongsTo(Major::class);
     }
     public function practices() :HasMany
     {

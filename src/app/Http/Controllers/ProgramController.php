@@ -62,14 +62,14 @@ class ProgramController extends Controller
     public function restore(Program $program)
     {
         $program->restore();
-        return response()->json(['message' => 'Úspešne reaktovovaný']);
+        return response()->json(['message' => 'úspešne obnovený záznam']);
     }
 
     public function forceDelete(Program $program)
     {
         $program->forceDelete();
         return response()->json([
-            'message' => 'Používateľ bol úspešne odstránený.',
+            'message' => 'úspešne odstránený záznam',
         ]);
     }
 

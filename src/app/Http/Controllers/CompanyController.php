@@ -46,7 +46,6 @@ class CompanyController extends Controller
 
     public function show(Company $company)
     {
-        return response($company->companyEmployees()->user);
         return response()->json($company);
     }
 
@@ -77,14 +76,14 @@ class CompanyController extends Controller
     }
     public function restore(Company $company){
         $company->restore();
-        return response()->json(['message' => 'Úspešne reaktovovaný']);
+        return response()->json(['message' => 'Úspešne obnovený záznam']);
     }
 
     public function forceDelete(Company $company)
     {
         $company->forceDelete();
         return response()->json([
-            'message' => 'Používateľ bol úspešne odstránený.',
+            'message' => 'úspešne odstránený záznam',
         ]);
     }
     public function indexDeleted()

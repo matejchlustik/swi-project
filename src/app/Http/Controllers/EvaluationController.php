@@ -77,14 +77,14 @@ class EvaluationController extends Controller
     }
     public function restore(Evaluation $evaluation){
         $evaluation->restore();
-        return response()->json(['message' => 'Úspešne reaktovovaný']);
+        return response()->json(['message' => 'Úspešne obnovený záznam']);
     }
 
     public function forceDelete(Evaluation $evaluation)
     {
         $evaluation->forceDelete();
         return response()->json([
-            'message' => 'Používateľ bol úspešne odstránený.',
+            'message' => 'úspešne odstránený záznam.',
         ]);
     }
     public function indexDeleted()

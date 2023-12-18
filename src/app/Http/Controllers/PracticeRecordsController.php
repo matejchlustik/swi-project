@@ -92,19 +92,19 @@ class PracticeRecordsController extends Controller
     }
     public function restore(PracticeRecord $practiceRecord){
         $practiceRecord->restore();
-        return response()->json(['message' => 'Úspešne reaktovovaný']);
+        return response()->json(['message' => 'úspešne obnovený záznam']);
     }
 
     public function forceDelete(PracticeRecord $user)
     {
         $user->forceDelete();
         return response()->json([
-            'message' => 'Používateľ bol úspešne odstránený.',
+            'message' => 'úspešne odstránený záznam',
         ]);
     }
     public function indexDeleted()
     {
-        $users = User::onlyTrashed()->paginate(20);
+        $users = PracticeRecord::onlyTrashed()->paginate(20);
 
         return response([
             'items' => $users->items(),

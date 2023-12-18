@@ -85,14 +85,14 @@ class CompanyDepartmentController extends Controller
     }
     public function restore(CompanyDepartment $companyDepartment){
         $companyDepartment->restore();
-        return response()->json(['message' => 'Úspešne reaktovovaný']);
+        return response()->json(['message' => 'Úspešne obnovený záznam']);
     }
 
     public function forceDelete(CompanyDepartment $companyDepartment)
     {
         $companyDepartment->forceDelete();
         return response()->json([
-            'message' => 'Používateľ bol úspešne odstránený.',
+            'message' => 'úspešne odstránený záznam.',
         ]);
     }
     public function indexDeleted()

@@ -53,14 +53,14 @@ class FacultyController extends Controller
     }
     public function restore(Faculty $faculty){
         $faculty->restore();
-        return response()->json(['message' => 'Úspešne reaktovovaný']);
+        return response()->json(['message' => 'Úspešne obnovený záznam']);
     }
 
     public function forceDelete(Faculty $faculty)
     {
         $faculty->forceDelete();
         return response()->json([
-            'message' => 'Používateľ bol úspešne odstránený.',
+            'message' => 'úspešne odstránený záznam',
         ]);
     }
     public function indexDeleted()

@@ -53,14 +53,14 @@ class MajorController extends Controller
     }
     public function restore(Major $major){
         $major->restore();
-        return response()->json(['message' => 'Úspešne reaktovovaný']);
+        return response()->json(['message' => 'úspešne obnovený záznam']);
     }
 
     public function forceDelete(Major $major)
     {
         $major->forceDelete();
         return response()->json([
-            'message' => 'Používateľ bol úspešne odstránený.',
+            'message' => 'úspešne odstránený záznam',
         ]);
     }
     public function indexDeleted()
