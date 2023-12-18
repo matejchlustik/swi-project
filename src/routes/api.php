@@ -43,8 +43,6 @@ Route::post('/reset-password', [UserController::class, "passwordReset"])->name('
 //Routes accesible only with token
 Route::group(['middleware' => ['auth:sanctum']], function () {
 
-    Route::get('/email/verify',[EmailVerificationController::class, "notice"])->name('verification.notice');
-
     Route::get('/email/verify/{id}/{hash}', [EmailVerificationController::class, "verify"])->middleware('signed')->name('verification.verify');
 
     Route::get('/email/verification-notification', [EmailVerificationController::class, "resend"])->name('verification.send');
