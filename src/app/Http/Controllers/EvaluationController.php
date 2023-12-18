@@ -36,7 +36,7 @@ class EvaluationController extends Controller
         if(auth()->user()->role->role === "Študent") {
             if($practice->user_id != auth()->id()) {
                 return response ("Forbidden", 403);
-            } 
+            }
         }
 
         return response($practice->evaluations->load(["departmentEmployee.user"]));
@@ -75,5 +75,30 @@ class EvaluationController extends Controller
 
         return response()->json(['message' => 'Evaluation deleted successfully.']);
     }
+    public function restore(Evaluation $evaluation){
+        $evaluation->restore();
+        return response()->json(['message' => 'Úspešne obnovený záznam']);
+    }
+
+    public function forceDelete(Evaluation $evaluation)
+    {
+        $evaluation->forceDelete();
+        return response()->json([
+            'message' => 'úspešne odstránený záznam.',
+        ]);
+    }
+    public function indexDeleted()
+    {
+        $evaluations = Evaluation::onlyTrashed()->paginate(20);
+
+        return response([
+            'items' => $evaluations->items(),
+            'prev_page_url' => $evaluations->previousPageUrl(),
+            'next_page_url' => $evaluations->nextPageUrl(),
+            'last_page' => $evaluations->lastPage(),
+            'total' => $evaluations->total()
+        ]);
+    }
+
 
 }

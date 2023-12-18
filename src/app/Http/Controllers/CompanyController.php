@@ -74,5 +74,28 @@ class CompanyController extends Controller
             'message' => 'Company deleted successfully.',
         ]);
     }
+    public function restore(Company $company){
+        $company->restore();
+        return response()->json(['message' => 'Úspešne obnovený záznam']);
+    }
 
+    public function forceDelete(Company $company)
+    {
+        $company->forceDelete();
+        return response()->json([
+            'message' => 'úspešne odstránený záznam',
+        ]);
+    }
+    public function indexDeleted()
+    {
+        $companies = Company::onlyTrashed()->paginate(20);
+
+        return response([
+            'items' => $companies->items(),
+            'prev_page_url' => $companies->previousPageUrl(),
+            'next_page_url' => $companies->nextPageUrl(),
+            'last_page' => $companies->lastPage(),
+            'total' => $companies->total()
+        ]);
+    }
 }

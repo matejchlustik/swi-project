@@ -229,7 +229,8 @@ class UserController extends Controller
                             "read-workplaces",
                             "manage-evaluation",
                             "manage-company",
-                            "manage-users"
+                            "manage-users",
+                            "admin-deleted-data"
                         ]
                     )->plainTextToken;
                     break;
@@ -391,31 +392,35 @@ class UserController extends Controller
     {
         $users = Department::find($department->id)->users()->paginate(10);
 
-
-        if (auth()->user()->role->role !== "Admin") {
-            $users->whereNull('deleted_at');
-        }
-
-        return response($users);
-    }
-
-    public function deactivate(User $user)
-    {
-        $user->delete();
-        $user->tokens()->delete();      //toto by som asi nemal vymazavat alebo pri activate by som mal spravit token znova
-        $user->save();
-        return response()->json(['message' => 'Úspešne deaktivovaný']);
-    }
-    public function restore(User $user){
-        $user->restore();
-        return response()->json(['message' => 'Úspešne reaktovovaný']);
+        return response([
+            'items' => $users->items(),
+            'prev_page_url' =>$users->previousPageUrl(),
+            'next_page_url' => $users->nextPageUrl(),
+            'last_page' =>$users->lastPage(),
+            'total' => $users->total()
+        ]);
     }
 
     public function destroy(User $user)
     {
+        $user->delete();
+        $user->tokens()->delete();      //toto by som asi nemal vymazavat alebo pri activate by som mal spravit token znova
+        $user->save();
+        return response()->json(['message' => 'Úspešne zmazaný']);
+    }
+    public function restore(User $user){
+        $user->restore();
+        return response()->json(['message' => 'Úspešne obnovený záznam']);
+    }
+
+    public function forceDelete(User $user)
+    {
+                if($user->id === auth()->user()->id) {
+                    return response("Cant delete yourself");
+                }
                 $user->forceDelete();
                 return response()->json([
-                    'message' => 'Používateľ bol úspešne odstránený.',
+                    'message' => 'úspešne odstránený záznam',
                 ]);
     }
 
@@ -430,7 +435,14 @@ class UserController extends Controller
 
     public function showByRole(Role $role)
     {
-        return response()->json($role->users);
+        $users=$role->users()->paginate(10);
+        return response([
+            'items' => $users->items(),
+            'prev_page_url' =>$users->previousPageUrl(),
+            'next_page_url' => $users->nextPageUrl(),
+            'last_page' =>$users->lastPage(),
+            'total' => $users->total()
+        ]);
     }
 
 
@@ -456,7 +468,7 @@ class UserController extends Controller
                 if (isset($fields['role_id'])){
                     return response('Cannot change role', 400);
                 }
-                
+
                 $this->updateUser($user,$validate,$userRole);
                 return response($user);
             }
@@ -471,11 +483,9 @@ class UserController extends Controller
                     'first_name' => 'string',
                     'last_name' => 'string',
                     'email' => 'email',
+                    'phone'=>'string'
                 ]);
-                $user->fill($validate);
-                $user->save();
-
-                return response($user);
+                return response($this->updateUser($user, $validate, $userRole));
             }
         } else {
             return response("Forbidden", 403);
@@ -490,6 +500,7 @@ class UserController extends Controller
             $companyEmployee = CompanyEmployee::where('user_id',$user->id)->first();
             $companyEmployee->fill($fields);
             $companyEmployee->save();
+            return $user->load(["companyEmployee"]);
         }
         if($userRole==="Poverený pracovník pracoviska" || $userRole==="Vedúci pracoviska"){
             $departmentEmployee=DepartmentEmployee::where('user_id',$user->id)->where('to',null)->first();
@@ -501,8 +512,11 @@ class UserController extends Controller
                     'department_id'=>$fields['department_id'],
                     'from'=>now()
                 ]);
-            }   
+
+            }
+            return $user->load(["departmentEmployee"]);
         }
+        return $user;
     }
 
 

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->string('name');
             $table->string('short');
             $table->foreignId('major_id')->constrained()->onDelete("cascade");
+            $table->softDeletes();
         });
     }
 

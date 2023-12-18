@@ -56,6 +56,48 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         //Routes accesible only if email is verified
         Route::group(['middleware' => ['verified']], function () {
 
+            Route::group(['middleware' => ["ability:admin-deleted-data"]], function () {
+                Route::put("/departments/{department}/restore", [DepartmentController::class, "restore"])->withTrashed();
+                Route::put("/evaluations/{evaluation}/restore", [EvaluationController::class, "restore"])->withTrashed();
+                Route::put("/comments/{comment}/restore", [CommentController::class, "restore"])->withTrashed();
+                Route::put("/companies/{company}/restore", [CompanyController::class, "restore"])->withTrashed();
+                Route::put("/company_department/{company_department}/restore", [CompanyDepartmentController::class, "restore"])->withTrashed();
+                Route::put("/faculties/{faculty}/restore", [FacultyController::class, "restore"])->withTrashed();
+                Route::put("/feedback/{feedback}/restore", [FeedbackController::class, "restore"])->withTrashed();
+                Route::put("/majors/{major}/restore", [MajorController::class, "restore"])->withTrashed();
+                Route::put("/practices/{practice}/restore", [PracticeController::class, "restore"])->withTrashed();
+                Route::put("/practice_offers/{practice_offer}/restore", [PracticeOffersController::class, "restore"])->withTrashed();
+                Route::put("/practice_records/{practice_record}/restore", [PracticeRecordsController::class, "restore"])->withTrashed();
+                Route::put("/programs/{program}/restore", [ProgramController::class, "restore"])->withTrashed();
+                Route::put("/users/{user}/restore", [UserController::class, "restore"])->withTrashed();
+                Route::delete("/departments/{department}/force-delete", [DepartmentController::class, "forceDelete"])->withTrashed();
+                Route::delete("/evaluations/{evaluation}/force-delete", [EvaluationController::class, "forceDelete"])->withTrashed();
+                Route::delete("/comments/{comment}/force-delete", [CommentController::class, "forceDelete"])->withTrashed();
+                Route::delete("/companies/{company}/force-delete", [CompanyController::class, "forceDelete"])->withTrashed();
+                Route::delete("/company_department/{company_department}/force-delete", [CompanyDepartmentController::class, "forceDelete"])->withTrashed();
+                Route::delete("/faculties/{faculty}/force-delete", [FacultyController::class, "forceDelete"])->withTrashed();
+                Route::delete("/feedback/{feedback}/force-delete", [FeedbackController::class, "forceDelete"])->withTrashed();
+                Route::delete("/majors/{major}/force-delete", [MajorController::class, "forceDelete"])->withTrashed();
+                Route::delete("/practices/{practice}/force-delete", [PracticeController::class, "forceDelete"])->withTrashed();
+                Route::delete("/practice_offers/{practice_offer}/force-delete", [PracticeOffersController::class, "forceDelete"])->withTrashed();
+                Route::delete("/practice_records/{practice_record}/force-delete", [PracticeRecordsController::class, "forceDelete"])->withTrashed();
+                Route::delete("/programs/{program}/force-delete", [ProgramController::class, "forceDelete"])->withTrashed();
+                Route::delete("/users/{user}/force-delete", [UserController::class, "forceDelete"])->withTrashed();
+                Route::get("/departments/soft_deleted", [DepartmentController::class, "indexDeleted"]);
+                Route::get("/evaluations/soft_deleted", [EvaluationController::class, "indexDeleted"]);
+                Route::get("/comments/soft_deleted", [CommentController::class, "indexDeleted"]);
+                Route::get("/companies/soft_deleted", [CompanyController::class, "indexDeleted"]);
+                Route::get("/company_department/soft_deleted", [CompanyDepartmentController::class, "indexDeleted"]);
+                Route::get("/faculties/soft_deleted", [FacultyController::class, "indexDeleted"]);
+                Route::get("/feedback/soft_deleted", [FeedbackController::class, "indexDeleted"]);
+                Route::get("/majors/soft_deleted", [MajorController::class, "indexDeleted"]);
+                Route::get("/practices/soft_deleted", [PracticeController::class, "indexDeleted"]);
+                Route::get("/practice_offers/soft_deleted", [PracticeOffersController::class, "indexDeleted"]);
+                Route::get("/practice_records/soft_deleted", [PracticeRecordsController::class, "indexDeleted"]);
+                Route::get("/programs/soft_deleted", [ProgramController::class, "indexDeleted"]);
+                Route::get("/users/soft_deleted", [UserController::class, "indexDeleted"]);
+            });
+            
             Route::group(['middleware' => ["ability:manage-practice-offers"]], function () {
                 Route::post("/practice_offers", [PracticeOffersController::class, "store"]);
                 Route::put("/practice_offers/{practiceOffer}", [PracticeOffersController::class, "update"]);
@@ -123,19 +165,19 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
             Route::group(['middleware' => ["ability:manage-workplaces"]], function () {
                 Route::post("/faculties", [FacultyController::class, "store"]);
-                Route::delete('/faculties/{faculty}', [FacultyController::class, "destroy"]);  
+                Route::delete('/faculties/{faculty}', [FacultyController::class, "destroy"]);
                 Route::put('/faculties/{faculty}', [FacultyController::class, 'update']);
                 Route::post("/departments", [DepartmentController::class, "store"]);
-                Route::delete('/departments/{department}', [DepartmentController::class, "destroy"]);  
+                Route::delete('/departments/{department}', [DepartmentController::class, "destroy"]);
                 Route::put('/departments/{department}', [DepartmentController::class, 'update']);
                 Route::post("/majors", [MajorController::class, "store"]);
-                Route::delete('/majors/{major}', [MajorController::class, "destroy"]);  
+                Route::delete('/majors/{major}', [MajorController::class, "destroy"]);
                 Route::put('/majors/{major}', [MajorController::class, 'update']);
                 Route::post("/programs", [ProgramController::class, "store"]);
-                Route::delete('/programs/{program}', [ProgramController::class, "destroy"]);  
+                Route::delete('/programs/{program}', [ProgramController::class, "destroy"]);
                 Route::put('/programs/{program}', [ProgramController::class, 'update']);
             });
-            
+
             Route::group(['middleware' => ["ability:read-workplaces"]], function () {
                 Route::get('/faculties', [FacultyController::class, 'index']);
                 Route::get('/faculties/{faculty}', [FacultyController::class, "show"]);
@@ -156,18 +198,20 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
             Route::get('/practices/{practice}/evaluations', [EvaluationController::class, 'index'])->middleware('ability:read-evaluation,manage-evaluation');
 
             Route::group(['middleware' => ["ability:manage-users"]], function () {
-                Route::get("/users", [UserController::class, "index"])->withTrashed();;
-                Route::get("/users/role/{role}", [UserController::class, "showByRole"])->withTrashed();
+                Route::get("/users", [UserController::class, "index"]);
+                Route::get("/users/role/{role}", [UserController::class, "showByRole"]);
                 Route::get("/users/{user}", [UserController::class, "show"])->withTrashed();
-                Route::delete('/users/{user}', [UserController::class, "deactivate"]);
+                Route::delete('/users/{user}', [UserController::class, "destroy"]);
                 Route::get("/users/departments/{department}", [UserController::class, "showByDepartment"])->withTrashed();
             });
 
             Route::post("/users", [UserController::class, "store"])->middleware(
                 'ability:create-department-head,create-department-employee,create-company-representative,create-student'
             );
-            
+
             Route::put('/users/{user}', [UserController::class, "update"]);
+
+            
 
     });
 

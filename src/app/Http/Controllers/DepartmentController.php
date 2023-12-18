@@ -53,4 +53,28 @@ class DepartmentController extends Controller
             'message' => 'Faculty deleted successfully.',
         ]);
     }
+    public function restore(Department $department){
+        $department->restore();
+        return response()->json(['message' => 'Úspešne obnovený záznam']);
+    }
+
+    public function forceDelete(Department $department)
+    {
+        $department->forceDelete();
+        return response()->json([
+            'message' => 'Úspešne odstránený záznam',
+        ]);
+    }
+    public function indexDeleted()
+    {
+        $departments = Department::onlyTrashed()->paginate(20);
+
+        return response([
+            'items' => $departments->items(),
+            'prev_page_url' => $departments->previousPageUrl(),
+            'next_page_url' => $departments->nextPageUrl(),
+            'last_page' => $departments->lastPage(),
+            'total' => $departments->total()
+        ]);
+    }
 }
