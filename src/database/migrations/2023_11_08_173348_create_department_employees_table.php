@@ -13,8 +13,12 @@ return new class extends Migration
     {
         Schema::create('department_employees', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained();
-            $table->foreignId('department_id')->constrained();
+            $table->foreignId('user_id')->constrained()->onDelete("cascade");
+            $table->unsignedBigInteger('department_id')->nullable();
+            $table->foreign('department_id')->references('id')->on('departments')->nullOnDelete();
+            $table->date('from');
+            $table->date('to')->nullable()->default(null);
+            $table->softDeletes();
         });
     }
 
@@ -25,4 +29,5 @@ return new class extends Migration
     {
         Schema::dropIfExists('department_employees');
     }
+
 };

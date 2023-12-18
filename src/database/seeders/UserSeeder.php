@@ -57,11 +57,13 @@ class UserSeeder extends Seeder {
         DB::table('department_employees')->insert([
             [
                 'user_id' => 2,
-                'department_id' => 1
+                'department_id' => 1,
+                'from'=>now()
             ],
             [
                 'user_id' => 3,
-                'department_id' => 1
+                'department_id' => 1,
+                'from'=>now()
             ]
         ]);
         DB::table('company_employees')->insert([

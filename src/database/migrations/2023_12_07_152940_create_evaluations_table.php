@@ -11,13 +11,12 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('practice_records', function (Blueprint $table) {
+        Schema::create('evaluations', function (Blueprint $table) {
             $table->id();
-            $table->date('from');
-            $table->date('to');
-            $table->string('description');
-            $table->integer('hours');
-            $table->foreignId('practice_id')->constrained()->onDelete('cascade');
+            $table->foreignId('practice_id')->constrained();
+            $table->unsignedBigInteger('department_employee_id')->nullable();
+            $table->foreign('department_employee_id')->references('id')->on('department_employees')->nullOnDelete();
+            $table->tinyInteger('evaluation');
             $table->timestamps();
             $table->softDeletes();
         });
@@ -28,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('practice_records');
+        Schema::dropIfExists('evaluations');
     }
 };

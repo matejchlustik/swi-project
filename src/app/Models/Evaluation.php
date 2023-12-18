@@ -4,22 +4,23 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class Feedback extends Model
+
+class Evaluation extends Model
 {
-    use HasFactory,SoftDeletes;
+    use SoftDeletes;
     protected $fillable = [
-        'body',
-        'user_id',
-        'practice_id'
+        'practice_id',
+        'department_employee_id',
+        'evaluation'
     ];
 
-    public function user() :BelongsTo
+    public function departmentEmployee() :BelongsTo
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(DepartmentEmployee::class);
     }
+
     public function practice() :BelongsTo
     {
         return $this->belongsTo(Practice::class);

@@ -24,7 +24,6 @@ class PracticeFactory extends Factory
             'to' => $this->faker->dateTimeBetween("2023/05/01","2023/05/31"),
             'user_id' => 5,
             'company_employee_id' => 1,
-            'department_employee_id' => null,
             'program_id' => 2,
             'contract' => 'cesta ku suboru',
             'practice_status_id' => PracticeStatus::firstWhere("status", "Neschválená")->id

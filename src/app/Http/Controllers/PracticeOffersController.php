@@ -32,8 +32,8 @@ class PracticeOffersController extends Controller
     public function store(Request $request)
     {
         $validatedData = $request->validate([
-            'description' => 'required',
-            'phone' => 'required',
+            'description' => 'required|string',
+            'phone' => 'required|string',
             'email' => 'required|email',
             'company_department_id' => 'required|exists:company_department,id'
         ]);
@@ -60,8 +60,14 @@ class PracticeOffersController extends Controller
                 return response("Forbidden", 403);
             }
         }
+        $validatedData = $request->validate([
+            'description' => 'string',
+            'phone' => 'string',
+            'email' => 'email',
+            'company_department_id' => 'exists:company_department,id'
+        ]);
 
-        $practiceOffer->fill($request->all());
+        $practiceOffer->fill($validatedData);
         $practiceOffer->save();
 
         return response()->json($practiceOffer);
@@ -76,7 +82,32 @@ class PracticeOffersController extends Controller
             }
         }
         $practiceOffer->delete();
-        return response()->json(['message' => 'Úspěšně smazáno']);
+        return response()->json(['message' => 'Practice offer deleted succesfully']);
     }
+    public function restore(PracticeOffer $practiceOffer){
+        $practiceOffer->restore();
+        return response()->json(['message' => 'úspešne obnovený záznam']);
+    }
+
+    public function forceDelete(PracticeOffer $practiceOffer)
+    {
+        $practiceOffer->forceDelete();
+        return response()->json([
+            'message' => 'úspešne odstránený záznam',
+        ]);
+    }
+    public function indexDeleted()
+    {
+        $practiceOffers = PracticeOffer::onlyTrashed()->paginate(20);
+
+        return response([
+            'items' => $practiceOffers->items(),
+            'prev_page_url' => $practiceOffers->previousPageUrl(),
+            'next_page_url' => $practiceOffers->nextPageUrl(),
+            'last_page' => $practiceOffers->lastPage(),
+            'total' => $practiceOffers->total()
+        ]);
+    }
+
 
 }

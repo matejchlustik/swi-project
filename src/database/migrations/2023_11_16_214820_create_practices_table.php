@@ -15,12 +15,14 @@ return new class extends Migration
             $table->id();
             $table->date('from');
             $table->date('to');
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('user_id')->constrained()->onDelete("cascade");
             $table->foreignId('company_employee_id')->constrained();
-            $table->foreignId('department_employee_id')->nullable()->constrained();
-            $table->foreignId('program_id')->constrained();
+            $table->unsignedBigInteger('program_id')->nullable();
+            $table->foreign('program_id')->references('id')->on('programs')->nullOnDelete();
             $table->string('contract',255)->nullable();
+            $table->string('completion_confirmation',255)->nullable();
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

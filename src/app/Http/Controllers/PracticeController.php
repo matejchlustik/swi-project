@@ -9,6 +9,7 @@ use App\Models\PracticeRecord;
 use App\Models\PracticeStatus;
 use Illuminate\Validation\Rules\File;
 use Illuminate\Support\Facades\Storage;
+use Barryvdh\DomPDF\Facade\Pdf as PDF;
 
 
 class PracticeController extends Controller
@@ -19,17 +20,16 @@ class PracticeController extends Controller
         $validated = $request->validate([
             'from' => 'required|date',
             'to' => 'required|date|after:from',
-            'company_employee_id' => 'required|integer|not_in:0',
-            'program_id' => 'required|integer|not_in:0',
+            'company_employee_id' => 'required|integer|not_in:0|exists:company_employees,id',
+            'program_id' => 'required|integer|not_in:0|exists:programs,id',
             'contract' => ["nullable",File::types(['docx', 'pdf'])],
-            
+
         ]);
         $newPractice = new Practice();
         $newPractice->practice_status_id = PracticeStatus::firstWhere("status", "Neschválená")->id;
         $newPractice->from = $validated['from'];
         $newPractice->to = $validated['to'];
         $newPractice->company_employee_id = $validated['company_employee_id'];
-        $newPractice->department_employee_id = $request->input('department_employee_id');
         $newPractice->program_id = $validated['program_id'];
         $newPractice->user_id = auth()->id();
 
@@ -95,7 +95,7 @@ class PracticeController extends Controller
              'from' => 'date',
              'to' => 'date|after:from',
              'company_employee_id' => 'integer|not_in:0',
-             'program_id' => 'integer|not_in:0',
+             'program_id' => 'integer|not_in:0|exists:programs,id',
              'contract' => ["nullable",File::types(['docx', 'pdf'])],
              'practice_status_id' => 'integer|exists:practice_statuses,id'
          ]);
@@ -157,15 +157,105 @@ class PracticeController extends Controller
     public function getPracticesByPracticeStatus(PracticeStatus $practiceStatus) {
         $practices = Practice::where('practice_status_id', $practiceStatus->id)->latest()->paginate(10);
 
-        return response($practices);
+        return response([
+            'items' => $practices->items(),
+            'prev_page_url' =>$practices->previousPageUrl(),
+            'next_page_url' => $practices->nextPageUrl(),
+            'last_page' =>$practices->lastPage(),
+            'total' => $practices->total()
+        ]);
     }
 
     public function getPracticesByProgram(Program $program) {
         $practices = Practice::where('program_id', $program->id)->latest()->paginate(10);
 
-        return response($practices);
+        return response([
+            'items' => $practices->items(),
+            'prev_page_url' =>$practices->previousPageUrl(),
+            'next_page_url' => $practices->nextPageUrl(),
+            'last_page' =>$practices->lastPage(),
+            'total' => $practices->total()
+        ]);
     }
 
+    public function generateCompletionConfirmation(Practice $practice) {
+
+        if(auth()->user()->role->role === "Študent") {
+            if($practice->user_id !== auth()->id()) {
+                return response ("Forbidden", 403);
+            }
+        }
+
+        if($practice->completion_confirmation) {
+            return Storage::download('completionConfirmations/'.$practice->completion_confirmation);
+        }
+        $pdf = PDF::loadView('practiceConfirmation',
+        [
+            'practiceRecords' => $practice->practiceRecords,
+            'practice' => $practice,
+            'company' => $practice->company,
+            'companyEmployee' => $practice->companyEmployee,
+            'user' => $practice->user,
+            'program' => $practice->program
+        ]);
+        $content = $pdf->download()->getOriginalContent();
+        Storage::put("completionConfirmations/completionConfirmation".$practice->id.".pdf",$content);         //ubuntu cmd: sudo chmod -R 777 storage
+        $practice->completion_confirmation = "completionConfirmation".$practice->id.".pdf";
+
+        $practice->save();
+
+        return Storage::download('completionConfirmations/'.$practice->completion_confirmation);
+    }
+
+    public function regenerateCompletionConfirmation(Practice $practice) {
+
+        if(auth()->user()->role->role === "Študent") {
+            if($practice->user_id !== auth()->id()) {
+                return response ("Forbidden", 403);
+            }
+        }
+
+        $pdf = PDF::loadView('practiceConfirmation',
+        [
+            'practiceRecords' => $practice->practiceRecords,
+            'practice' => $practice,
+            'company' => $practice->company,
+            'companyEmployee' => $practice->companyEmployee,
+            'user' => $practice->user,
+            'program' => $practice->program
+        ]);
+        $content = $pdf->download()->getOriginalContent();
+        Storage::put("completionConfirmations/completionConfirmation".$practice->id.".pdf",$content);         //ubuntu cmd: sudo chmod -R 777 storage
+        $practice->completion_confirmation = "completionConfirmation".$practice->id.".pdf";
+
+        $practice->save();
+
+        return Storage::download('completionConfirmations/'.$practice->completion_confirmation);
+    }
+    public function restore(Practice $practice){
+        $practice->restore();
+        return response()->json(['message' => 'Úspešne obnovený záznam']);
+    }
+
+    public function forceDelete(Practice $practice)
+    {
+        $practice->forceDelete();
+        return response()->json([
+            'message' => 'úspešne odstránený záznam',
+        ]);
+    }
+    public function indexDeleted()
+    {
+        $practices = Practice::onlyTrashed()->paginate(20);
+
+        return response([
+            'items' => $practices->items(),
+            'prev_page_url' => $practices->previousPageUrl(),
+            'next_page_url' => $practices->nextPageUrl(),
+            'last_page' => $practices->lastPage(),
+            'total' => $practices->total()
+        ]);
+    }
 
 
 }

@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('company_employees', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->constrained()->unique();
-            $table->foreignId('company_id')->constrained();
+            $table->foreignId('user_id')->constrained()->unique()->onDelete("cascade");
+            $table->unsignedBigInteger('company_id')->nullable();
+            $table->foreign('company_id')->references('id')->on('companies')->nullOnDelete();
             $table->string('phone');
+            $table->softDeletes();
         });
     }
 

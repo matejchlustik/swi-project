@@ -27,8 +27,17 @@ class CompanyController extends Controller
                 return response("Forbidden", 403);
             }
         }
-
-        $company->fill($request->all());
+        $validatedData = $request->validate([
+            'ICO' => 'integer',
+            'name' => 'string',
+            'city' => 'string',
+            'zip_code' => 'string',
+            'phone' => 'string',
+            'email' => 'email|string',
+            'street' => 'string',
+            'house_number' => 'string',
+        ]);
+        $company->fill($validatedData);
         $company->save();
 
         return response()->json($company);
@@ -42,7 +51,17 @@ class CompanyController extends Controller
 
     public function store(Request $request)
     {
-        $company = Company::create($request->all());
+        $validatedData = $request->validate([
+            'ICO' => 'required|integer',
+            'name' => 'required|string',
+            'city' => 'required|string',
+            'zip_code' => 'required|string',
+            'phone' => 'required|string',
+            'email' => 'required|email|string',
+            'street' => 'required|string',
+            'house_number' => 'required|string',
+        ]);
+        $company = Company::create($validatedData);
 
         return response()->json($company,201);
     }
@@ -55,5 +74,28 @@ class CompanyController extends Controller
             'message' => 'Company deleted successfully.',
         ]);
     }
+    public function restore(Company $company){
+        $company->restore();
+        return response()->json(['message' => 'Úspešne obnovený záznam']);
+    }
 
+    public function forceDelete(Company $company)
+    {
+        $company->forceDelete();
+        return response()->json([
+            'message' => 'úspešne odstránený záznam',
+        ]);
+    }
+    public function indexDeleted()
+    {
+        $companies = Company::onlyTrashed()->paginate(20);
+
+        return response([
+            'items' => $companies->items(),
+            'prev_page_url' => $companies->previousPageUrl(),
+            'next_page_url' => $companies->nextPageUrl(),
+            'last_page' => $companies->lastPage(),
+            'total' => $companies->total()
+        ]);
+    }
 }

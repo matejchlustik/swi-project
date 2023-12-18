@@ -19,6 +19,7 @@ return new class extends Migration
             $table->unsignedBigInteger('company_department_id');
             $table->timestamps();
             $table->foreign('company_department_id')->references('id')->on('company_department')->onDelete("cascade");
+            $table->softDeletes();
         });
     }
 

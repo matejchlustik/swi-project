@@ -4,21 +4,23 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
-use App\Notifications\ResetPassword;
-use App\Notifications\VerifyEmail;
-use Illuminate\Contracts\Auth\CanResetPassword;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Laravel\Sanctum\HasApiTokens;
+use App\Notifications\VerifyEmail;
+use App\Notifications\ResetPassword;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Contracts\Auth\MustVerifyEmail;
+use Illuminate\Contracts\Auth\CanResetPassword;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use App\Models\DepartmentEmployee;
 
 class User extends Authenticatable implements MustVerifyEmail
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -30,7 +32,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'last_name',
         'email',
         'password',
-        'role_id'
+        'role_id',
+        'from',
+        'to'
     ];
 
     /**
@@ -52,10 +56,19 @@ class User extends Authenticatable implements MustVerifyEmail
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
-
+    public static function booted()
+    {
+        static::deleting(function ($user) {
+            $user->departmentEmployee()->delete();
+            $user->companyEmployee()->delete();
+        });
+        static::restored(function ($user) {
+            $user->departmentEmployee()->withTrashed()->restore();
+            $user->companyEmployee()->withTrashed()->restore();
+        });
+    }
     public function sendPasswordResetNotification($token)
     {
-        // Your your own implementation.
         $this->notify(new ResetPassword($token));
     }
 
@@ -78,10 +91,10 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasOne(CompanyEmployee::class);
     }
-    
-    public function departmentEmployee() :HasOne
+
+    public function departmentEmployee() :HasMany
     {
-        return $this->hasOne(DepartmentEmployee::class);
+        return $this->hasMany(DepartmentEmployee::class);
     }
     public function comment() :HasMany
     {
@@ -91,4 +104,5 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->hasMany(feedback::class);
     }
+
 }

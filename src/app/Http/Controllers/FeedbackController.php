@@ -9,31 +9,41 @@ use Illuminate\Http\Request;
 
 class FeedbackController extends Controller
 {
-    public function index()
+    public function index(Practice $practice)
     {
-        $feedback = Feedback::paginate(20);
+        if(auth()->user()->role->role === "Študent") {
+            if($practice->user_id != auth()->id()) {
+                return response ("Forbidden", 403);
+            }
+        }
 
-        return response([
-            'items' => $feedback->items(),
-            'prev_page_url' =>$feedback->previousPageUrl(),
-            'next_page_url' => $feedback->nextPageUrl(),
-            'last_page' =>$feedback->lastPage(),
-            'total' => $feedback->total()
-        ]);
-    }
-    public function getFeedbacksByPracticeId(Practice $practice)
-    {
-        $feedback = Feedback::where("practice_id", $practice->id)->get();
-        return response($feedback);
+        if(auth()->user()->role->role === "Zástupca firmy") {
+            if($practice->companyEmployee->id != auth()->user()->companyEmployee->id) {
+                return response ("Forbidden", 403);
+            }
+        }
+
+        return response($practice->feedback->load(["user"]));
     }
 
-    public function store(Request $request)
+    public function store(Request $request, Practice $practice)
     {
+        if(auth()->user()->role->role === "Študent") {
+            if($practice->user_id != auth()->id()) {
+                return response ("Forbidden", 403);
+            }
+        }
+
+        if(auth()->user()->role->role === "Zástupca firmy") {
+            if($practice->companyEmployee->id != auth()->user()->companyEmployee->id) {
+                return response ("Forbidden", 403);
+            }
+        }
+
         $validatedData = $request->validate([
-            'body' => 'required',
-            'practice_id' => 'required|exists:practices,id',
+            'body' => 'required|string',
         ]);
-        $feedback = Feedback::create([...$validatedData, 'user_id' => auth()->user()->id]);
+        $feedback = Feedback::create([...$validatedData, 'user_id' => auth()->user()->id, 'practice_id' => $practice->id]);
         return response()->json($feedback);
 
     }
@@ -46,7 +56,7 @@ class FeedbackController extends Controller
             }
         }
         $validatedData = $request->validate([
-            'body' => 'required',
+            'body' => 'required|string',
         ]);
             $feedback->fill($validatedData);
             $feedback->save();
@@ -54,22 +64,39 @@ class FeedbackController extends Controller
             return response()->json($feedback);
     }
 
-    public function getFeedbacksByUserId(User $user)
-    {
-        $feedback = Feedback::where('user_id', $user->id)->get();
-
-        return response($feedback);
-    }
-
     public function destroy(Feedback $feedback)
     {
         if (auth()->user()->role->role !== "Admin") {
-        if (auth()->user()->id !== $feedback->user_id) {
-                return response("Forbidden", 403);
-        }
+            if (auth()->user()->id !== $feedback->user_id) {
+                    return response("Forbidden", 403);
+            }
         }
         $feedback->delete();
         return response()->json(['message' => 'Feedback deleted successfully.']);
+    }
+    public function restore(Feedback $feedback){
+        $feedback->restore();
+        return response()->json(['message' => 'Úspešne obnovený záznam']);
+    }
+
+    public function forceDelete(Feedback $feedback)
+    {
+        $feedback->forceDelete();
+        return response()->json([
+            'message' => 'úspešne odstránený záznam',
+        ]);
+    }
+    public function indexDeleted()
+    {
+        $feedbacks = Feedback::onlyTrashed()->paginate(20);
+
+        return response([
+            'items' => $feedbacks->items(),
+            'prev_page_url' => $feedbacks->previousPageUrl(),
+            'next_page_url' => $feedbacks->nextPageUrl(),
+            'last_page' => $feedbacks->lastPage(),
+            'total' => $feedbacks->total()
+        ]);
     }
 
 }
