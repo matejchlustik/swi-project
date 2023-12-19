@@ -16,7 +16,8 @@ return new class extends Migration
             $table->date('from');
             $table->date('to');
             $table->foreignId('user_id')->constrained()->onDelete("cascade");
-            $table->foreignId('company_employee_id')->constrained();
+            $table->unsignedBigInteger('company_employee_id')->nullable();
+            $table->foreign('company_employee_id')->references('id')->on('company_employees')->nullOnDelete();
             $table->unsignedBigInteger('program_id')->nullable();
             $table->foreign('program_id')->references('id')->on('programs')->nullOnDelete();
             $table->string('contract',255)->nullable();
