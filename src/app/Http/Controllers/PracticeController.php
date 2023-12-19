@@ -106,9 +106,9 @@ class PracticeController extends Controller
         if($userRole === "Admin" || $userRole === "Vedúci pracoviska" || $userRole === "Poverený pracovník pracoviska") {
             if($request->has('practice_status_id')) {
                 $practice->practice_status_id = $request["practice_status_id"];
+            } else {
+                return response("Cannot change practice status", 403);
             }
-        } else {
-            return response("Cannot change practice status", 403);
         }
 
         if ($request->hasFile('contract')){
