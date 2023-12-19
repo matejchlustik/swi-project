@@ -25,7 +25,6 @@ class Department extends Model
 
         static::deleting(function ($department) {
             $department->major()->get()->each->delete();
-            CompanyDepartment::where("department_id",$department->id)->get()->each->delete();
         });
 
 

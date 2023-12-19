@@ -20,10 +20,10 @@ class CompanyDepartment extends Pivot
     public static function booted()
     {
         static::deleting(function ($companyDepartment) {
-            $companyDepartment->practiceOffers()->get()->each->delete();
+            $companyDepartment->practiceOffers()->delete();
         });
         static::restored(function ($companyDepartment) {
-            $companyDepartment->practiceOffers()->withTrashed()->get()->each->restore();
+            $companyDepartment->practiceOffers()->withTrashed()->restore();
         });
     }
     public function practiceOffers(): HasMany

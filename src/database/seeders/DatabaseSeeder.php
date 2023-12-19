@@ -40,7 +40,7 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
         ]);
         CompanyEmployee::factory(0)->create();
-        Practice::factory(15)->create();
+        Practice::factory(10000)->create();
         PracticeRecord::factory(10)->create();
         CompanyDepartment::factory(30)->create();
         PracticeOffer::factory(10)->create();

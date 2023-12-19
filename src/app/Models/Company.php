@@ -22,12 +22,7 @@ class Company extends Model
         'house_number'
     ];
     protected $guarded = ['id'];
-    public static function booted()
-    {
-        static::deleting(function ($company) {
-            CompanyDepartment::where("company_id",$company->id)->withTrashed()->get()->each->delete();
-        });
-    }
+
     public function departments()
     {
         return $this->belongsToMany(Department::class)->using(CompanyDepartment::class);

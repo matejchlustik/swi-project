@@ -18,15 +18,7 @@ class Program extends Model
     ];
 
     public $timestamps = false;
-    public static function booted()
-    {
-        static::deleting(function ($program) {
-            $program->practices()->get()->each->delete();
-        });
-        static::restored(function ($program) {
-            $program->practices()->withTrashed()->get()->each->restore();
-        });
-    }
+
     public function major() :BelongsTo
     {
         return $this->belongsTo(Major::class);
